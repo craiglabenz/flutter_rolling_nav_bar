@@ -21,7 +21,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  rolling_tab_bar:
+  rolling_nav_bar:
     path: ../
 
   # The following adds the Cupertino Icons font to your application.

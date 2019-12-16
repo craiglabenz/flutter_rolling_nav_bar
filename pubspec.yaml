@@ -1,8 +1,8 @@
-name: rolling_tab_bar
-description: A Flutter tab bar with a rolling active indicator behind each icon
+name: rolling_nav_bar
+description: A Flutter nav bar with a rolling active indicator behind each icon
 version: 0.0.1-alpha
 author: Craig Labenz <craig.labenz@gmail.com>
-homepage: https://github.com/craiglabenz/flutter_rolling_tab_bar
+homepage: https://github.com/craiglabenz/flutter_rolling_nav_bar
 
 environment:
   sdk: ">=2.1.0 <3.0.0"

@@ -96,6 +96,11 @@ class RollingNavBar extends StatelessWidget {
   /// Fully-formed widgets to render in the tab bar. Pass this or [iconData].
   final List<Widget> children;
 
+  /// Optional list of colors for icons. If supplied, must have a length of one
+  /// or the same length as [iconData]. A length of 1 indicates a single color
+  /// for all tabs.
+  final List<Color> colors;
+
   /// Optional override for icon colors. If supplied, must have a length of one
   /// or the same length as [iconData]. A length of 1 indicates a single color
   /// for all tabs.
@@ -108,16 +113,14 @@ class RollingNavBar extends StatelessWidget {
   /// Optional custom size for each tab bar icon.
   final double iconSize;
 
+  /// Optional display override for the nav bar's background.
+  final BoxDecoration navBarDecoration;
+
   /// Optional handler which will be called on every tick of the animation.
   final Function(AnimationUpdate) onAnimate;
 
   /// Optional handler which is passed every updated active index.
   final Function(int) onTap;
-
-  /// Optional list of colors for icons. If supplied, must have a length of one
-  /// or the same length as [iconData]. A length of 1 indicates a single color
-  /// for all tabs.
-  final List<Color> colors;
 
   /// Rounded edge of the active indicator's corners.
   final double rollerCornerRadius;
@@ -133,15 +136,13 @@ class RollingNavBar extends StatelessWidget {
   /// realistic rolling illusion.
   final double sidesPerListItem;
 
-  /// Optional display override for the tab bar's background.
-  final BoxDecoration tabBarDecoration;
-
   RollingNavBar.children({
     this.activeIndex = 0,
     this.animationCurve = Curves.linear,
     this.animationType = AnimationType.roll,
     this.baseAnimationSpeed = 200,
     this.children,
+    this.navBarDecoration,
     this.onAnimate,
     this.onTap,
     this.colors = const <Color>[Colors.black],
@@ -149,7 +150,6 @@ class RollingNavBar extends StatelessWidget {
     this.rollerRadius = 25,
     this.rollerSides = 6,
     this.sidesPerListItem,
-    this.tabBarDecoration,
   })  : activeIconColors = null,
         iconColors = null,
         iconData = null,
@@ -164,6 +164,7 @@ class RollingNavBar extends StatelessWidget {
     this.iconColors = const <Color>[Colors.black],
     this.iconData,
     this.iconSize,
+    this.navBarDecoration,
     this.onAnimate,
     this.onTap,
     this.colors = const <Color>[Colors.pink],
@@ -171,7 +172,6 @@ class RollingNavBar extends StatelessWidget {
     this.rollerRadius = 25,
     this.rollerSides = 6,
     this.sidesPerListItem,
-    this.tabBarDecoration,
   })  : children = null,
         assert(rollerSides > 2),
         assert(activeIconColors == null || activeIconColors.length == 1 || activeIconColors.length == iconData.length),
@@ -199,7 +199,7 @@ class RollingNavBar extends StatelessWidget {
           rollerCornerRadius: rollerCornerRadius,
           rollerRadius: rollerRadius,
           rollerSides: rollerSides,
-          tabBarDecoration: tabBarDecoration,
+          navBarDecoration: navBarDecoration,
           sidesPerListItem: sidesPerListItem,
         );
       },
@@ -225,7 +225,7 @@ class _RollingNavBarInner extends StatefulWidget {
   final double rollerRadius;
   final int rollerSides;
   final double sidesPerListItem;
-  final BoxDecoration tabBarDecoration;
+  final BoxDecoration navBarDecoration;
   final double width;
   _RollingNavBarInner({
     @required this.activeIconColors,
@@ -245,7 +245,7 @@ class _RollingNavBarInner extends StatefulWidget {
     @required this.rollerRadius,
     @required this.rollerSides,
     @required this.sidesPerListItem,
-    @required this.tabBarDecoration,
+    @required this.navBarDecoration,
     @required this.width,
   });
   @override
@@ -431,7 +431,7 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner> with TickerPro
   Widget build(BuildContext context) {
     return Container(
       height: widget.height,
-      decoration: widget.tabBarDecoration ??
+      decoration: widget.navBarDecoration ??
           BoxDecoration(
             color: Colors.white,
           ),
@@ -453,8 +453,8 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner> with TickerPro
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: widget.children != null
-                  ? indexed(widget.children).map(_buildTabBarItem).toList()
-                  : indexed(widget.iconData).map(_buildTabBarIcon).toList(),
+                  ? indexed(widget.children).map(_buildNavBarItem).toList()
+                  : indexed(widget.iconData).map(_buildNavBarIcon).toList(),
             ),
           ),
         ],
@@ -462,7 +462,7 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner> with TickerPro
     );
   }
 
-  Widget _buildTabBarItem(Indexed indexed) {
+  Widget _buildNavBarItem(Indexed indexed) {
     return _RollerBarItem(
       indexed.value,
       isActive: activeIndex == indexed.index,
@@ -485,7 +485,7 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner> with TickerPro
     return widget.iconColors.length == widget.numChildren ? widget.iconColors[index] : widget.iconColors.first;
   }
 
-  Widget _buildTabBarIcon(Indexed indexed) {
+  Widget _buildNavBarIcon(Indexed indexed) {
     final bool isActive = activeIndex == indexed.index;
     return _RollerBarItem(
       Icon(

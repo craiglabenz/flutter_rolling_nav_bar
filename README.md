@@ -1,6 +1,6 @@
-# rolling_tab_bar
+# rolling_nav_bar
 
-A bottom tab bar with layout inspired by [this design](https://dribbble.com/shots/5713130-Greeny-app) and with heavily customizable animations, colors, and shapes.
+A bottom nav bar with layout inspired by [this design](https://dribbble.com/shots/5713130-Greeny-app) and with heavily customizable animations, colors, and shapes.
 
 ## Getting Started
 

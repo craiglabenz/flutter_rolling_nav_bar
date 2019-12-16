@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:polygon_clipper/polygon_clipper.dart';
-import 'package:rolling_tab_bar/rolling_nav_bar.dart';
+import 'package:rolling_nav_bar/rolling_nav_bar.dart';
 
 void main() => runApp(MyApp());
 
