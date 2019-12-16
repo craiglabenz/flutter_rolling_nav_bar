@@ -116,7 +116,7 @@ RollingNavBar.iconData(
 )
 ```
 
-<img src="https://raw.githubusercontent.com/craiglabenz/flutter_rolling_nav_bar/master/doc/assets/shrink-out-in.gif" alt="Roll Example" height="600" />
+<img src="https://raw.githubusercontent.com/craiglabenz/flutter_rolling_nav_bar/master/doc/assets/shrink-out-in.gif" alt="Shrink-out-in Example" height="600" />
 
 > Note: For the `shinkOutIn` animation type, theyour supplied animation speed is constant, since the active indicator never travels the intermediate distance.
 
@@ -135,7 +135,7 @@ RollingNavBar.iconData(
 )
 ```
 
-<img src="https://raw.githubusercontent.com/craiglabenz/flutter_rolling_nav_bar/master/doc/assets/spin-out-in.gif" alt="Roll Example" height="600" />
+<img src="https://raw.githubusercontent.com/craiglabenz/flutter_rolling_nav_bar/master/doc/assets/spin-out-in.gif" alt="Spin-out-in Example" height="600" />
 
 
 > Note: Like with `shinkOutIn`, for the `spinOutIn` animation type, your supplied animation speed is constant, since the active indicator never travels the intermediate distance.
@@ -154,7 +154,7 @@ RollingNavBar.iconData(
 )
 ```
 
-<img src="https://raw.githubusercontent.com/craiglabenz/flutter_rolling_nav_bar/master/doc/assets/snap.gif" alt="Roll Example" height="600" />
+<img src="https://raw.githubusercontent.com/craiglabenz/flutter_rolling_nav_bar/master/doc/assets/snap.gif" alt="Snap Example" height="600" />
 
 In addition to the above options, `animationCurve` and `baseAnimationSpeed` parameters
 are also exposed.
