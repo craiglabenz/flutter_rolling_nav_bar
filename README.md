@@ -99,6 +99,8 @@ RollingNavBar.iconData(
 
 <img src="https://raw.githubusercontent.com/craiglabenz/flutter_rolling_nav_bar/master/doc/assets/roll.gif" alt="Roll Example" height="600" />
 
+<br>
+
 > Note: For the `roll` animation type, your supplied animation speed is a multiplier considered against the distance the indicator must travel. This ensures a constant speed of travel no matter where the user clicks.
 
 ---
@@ -118,6 +120,8 @@ RollingNavBar.iconData(
 
 <img src="https://raw.githubusercontent.com/craiglabenz/flutter_rolling_nav_bar/master/doc/assets/shrink-out-in.gif" alt="Shrink-out-in Example" height="600" />
 
+<br>
+
 > Note: For the `shinkOutIn` animation type, theyour supplied animation speed is constant, since the active indicator never travels the intermediate distance.
 
 ---
@@ -128,7 +132,7 @@ The third animation type is a spinning version of fade-and-reappear:
 RollingNavBar.iconData(
   animationCurve: Curves.linear, // `linear` is recommended for `spinOutIn`
   animationType: AnimationType.spinOutIn,
-  baseAnimationSpeed: 200, // slower animations look nicer for `spinOutIn`
+  baseAnimationSpeed: 500, // slower animations look nicer for `spinOutIn`
   iconData: <IconData>[
     ...
   ],
@@ -137,6 +141,7 @@ RollingNavBar.iconData(
 
 <img src="https://raw.githubusercontent.com/craiglabenz/flutter_rolling_nav_bar/master/doc/assets/spin-out-in.gif" alt="Spin-out-in Example" height="600" />
 
+<br>
 
 > Note: Like with `shinkOutIn`, for the `spinOutIn` animation type, your supplied animation speed is constant, since the active indicator never travels the intermediate distance.
 
@@ -155,6 +160,8 @@ RollingNavBar.iconData(
 ```
 
 <img src="https://raw.githubusercontent.com/craiglabenz/flutter_rolling_nav_bar/master/doc/assets/snap.gif" alt="Snap Example" height="600" />
+
+<br>
 
 In addition to the above options, `animationCurve` and `baseAnimationSpeed` parameters
 are also exposed.
