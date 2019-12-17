@@ -10,11 +10,23 @@ enum AnimationType { roll, shrinkOutIn, snap, spinOutIn }
 /// Container for the most primitive data necessary to drive our animation with
 /// functions to yield the next tier of calculated data for the animation.
 class AnimationInfo {
+  /// Number of sides for the active indicator - e.g., 6 is a hexagon.
   final int numSides;
+
+  /// Index toward which the active indicator is heading.
   final int newIndex;
+
+  /// Index from which the active indicator is leaving.
   final int oldIndex;
+
+  /// The amount of sides on the active indicator that it should roll as it
+  /// traverses each list item. Calibrated to create a realistic rolling motion.
   final double sidesPerListItem;
+
+  /// The amount of rotation applied to the active indicator at the start of
+  /// this transition.
   final double startingRotation;
+
   AnimationInfo({
     @required this.newIndex,
     @required this.numSides,
@@ -23,12 +35,31 @@ class AnimationInfo {
     @required this.startingRotation,
   });
 
-  Direction get direction => newIndex > oldIndex ? Direction.forward : Direction.backward;
+  Direction get direction =>
+      newIndex > oldIndex ? Direction.forward : Direction.backward;
   int get indexDelta => (newIndex - oldIndex).abs();
+
+  /// Percent of a full rotation an active indicator should see for each of its
+  /// sides.
   double get radiansPerSide => 2 * pi / numSides;
+
+  /// Total rotation required to reach the new index.
+  ///
+  /// Note that this is correct because the active indicator holds its rotation
+  /// value when it gets to an index. So when the user clicks on Tab 2, the
+  /// indicator rolls there and holds. Imagine that it rolls 180°, or pi radians,
+  /// and then is followed up by a click on thie third tab, requiring yet another
+  /// 180° or pi radians. This number indicates that to reach the third tab,
+  /// a total rotation value of 2pi radians is required, but already stored is
+  /// that the active indicator has rotated pi radians (or 180°).
   double get radiansToRotate => newIndex * radiansPerSide * sidesPerListItem;
-  double get radiansToRotateDelta =>
-      direction == Direction.forward ? radiansToRotate - startingRotation : startingRotation - radiansToRotate;
+
+  /// Total rotation required to reach the new index, minus what has already
+  /// been rotated. This number is fixed from the beginning of the transition
+  /// and does not update as the active indicator animates.
+  double get radiansToRotateDelta => direction == Direction.forward
+      ? radiansToRotate - startingRotation
+      : startingRotation - radiansToRotate;
 }
 
 /// Container for the state of a [RollingNavBar]'s animation, useful for syncing
@@ -96,11 +127,6 @@ class RollingNavBar extends StatelessWidget {
   /// Fully-formed widgets to render in the tab bar. Pass this or [iconData].
   final List<Widget> children;
 
-  /// Optional list of colors for icons. If supplied, must have a length of one
-  /// or the same length as [iconData]. A length of 1 indicates a single color
-  /// for all tabs.
-  final List<Color> colors;
-
   /// Optional override for icon colors. If supplied, must have a length of one
   /// or the same length as [iconData]. A length of 1 indicates a single color
   /// for all tabs.
@@ -113,6 +139,21 @@ class RollingNavBar extends StatelessWidget {
   /// Optional custom size for each tab bar icon.
   final double iconSize;
 
+  /// Optional list of colors for the active indicator. If supplied, must have a
+  /// length of one or the same length as [iconData]. A length of 1 indicates a
+  /// single color for all tabs.
+  final List<Color> indicatorColors;
+
+  /// Rounded edge of the active indicator's corners.
+  final double indicatorCornerRadius;
+
+  /// Size of the background active indicator.
+  final double indicatorRadius;
+
+  /// Number of sides to the background active indicator. Value of `null`
+  /// indicates a circle, which negates the rolling effect.
+  final int indicatorSides;
+
   /// Optional display override for the nav bar's background.
   final BoxDecoration navBarDecoration;
 
@@ -121,16 +162,6 @@ class RollingNavBar extends StatelessWidget {
 
   /// Optional handler which is passed every updated active index.
   final Function(int) onTap;
-
-  /// Rounded edge of the active indicator's corners.
-  final double rollerCornerRadius;
-
-  /// Size of the background active indicator.
-  final double rollerRadius;
-
-  /// Number of sides to the background active indicator. Value of `null`
-  /// indicates a circle, which negates the rolling effect.
-  final int rollerSides;
 
   /// Rotation speed controller with a default value designed to create a
   /// realistic rolling illusion.
@@ -142,19 +173,19 @@ class RollingNavBar extends StatelessWidget {
     this.animationType = AnimationType.roll,
     this.baseAnimationSpeed = 200,
     this.children,
+    this.indicatorColors = const <Color>[Colors.black],
+    this.indicatorCornerRadius = 10,
+    this.indicatorRadius = 25,
+    this.indicatorSides = 6,
     this.navBarDecoration,
     this.onAnimate,
     this.onTap,
-    this.colors = const <Color>[Colors.black],
-    this.rollerCornerRadius = 10,
-    this.rollerRadius = 25,
-    this.rollerSides = 6,
     this.sidesPerListItem,
   })  : activeIconColors = null,
         iconColors = null,
         iconData = null,
         iconSize = null,
-        assert(rollerSides > 2);
+        assert(indicatorSides > 2);
   RollingNavBar.iconData({
     this.activeIconColors,
     this.activeIndex = 0,
@@ -164,19 +195,22 @@ class RollingNavBar extends StatelessWidget {
     this.iconColors = const <Color>[Colors.black],
     this.iconData,
     this.iconSize,
+    this.indicatorColors = const <Color>[Colors.pink],
+    this.indicatorCornerRadius = 10,
+    this.indicatorRadius = 25,
+    this.indicatorSides = 6,
     this.navBarDecoration,
     this.onAnimate,
     this.onTap,
-    this.colors = const <Color>[Colors.pink],
-    this.rollerCornerRadius = 10,
-    this.rollerRadius = 25,
-    this.rollerSides = 6,
     this.sidesPerListItem,
   })  : children = null,
-        assert(rollerSides > 2),
-        assert(activeIconColors == null || activeIconColors.length == 1 || activeIconColors.length == iconData.length),
+        assert(indicatorSides > 2),
+        assert(activeIconColors == null ||
+            activeIconColors.length == 1 ||
+            activeIconColors.length == iconData.length),
         assert(iconColors.length == 1 || iconColors.length == iconData.length),
-        assert(colors.length == 1 || colors.length == iconData.length);
+        assert(indicatorColors.length == 1 ||
+            indicatorColors.length == iconData.length);
 
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -193,12 +227,12 @@ class RollingNavBar extends StatelessWidget {
           iconColors: iconColors,
           iconData: iconData,
           iconSize: iconSize,
+          indicatorColors: indicatorColors,
+          indicatorCornerRadius: indicatorCornerRadius,
+          indicatorRadius: indicatorRadius,
+          indicatorSides: indicatorSides,
           onAnimate: onAnimate,
           onTap: onTap,
-          colors: colors,
-          rollerCornerRadius: rollerCornerRadius,
-          rollerRadius: rollerRadius,
-          rollerSides: rollerSides,
           navBarDecoration: navBarDecoration,
           sidesPerListItem: sidesPerListItem,
         );
@@ -217,13 +251,13 @@ class _RollingNavBarInner extends StatefulWidget {
   final List<Widget> children;
   final List<Color> iconColors;
   final List<IconData> iconData;
+  final List<Color> indicatorColors;
+  final double indicatorCornerRadius;
+  final double indicatorRadius;
+  final int indicatorSides;
   final double iconSize;
   final Function(AnimationUpdate) onAnimate;
   final Function(int) onTap;
-  final List<Color> colors;
-  final double rollerCornerRadius;
-  final double rollerRadius;
-  final int rollerSides;
   final double sidesPerListItem;
   final BoxDecoration navBarDecoration;
   final double width;
@@ -238,12 +272,12 @@ class _RollingNavBarInner extends StatefulWidget {
     @required this.iconColors,
     @required this.iconData,
     @required this.iconSize,
+    @required this.indicatorColors,
+    @required this.indicatorCornerRadius,
+    @required this.indicatorRadius,
+    @required this.indicatorSides,
     @required this.onAnimate,
     @required this.onTap,
-    @required this.colors,
-    @required this.rollerCornerRadius,
-    @required this.rollerRadius,
-    @required this.rollerSides,
     @required this.sidesPerListItem,
     @required this.navBarDecoration,
     @required this.width,
@@ -254,34 +288,37 @@ class _RollingNavBarInner extends StatefulWidget {
   int get numChildren => children != null ? children.length : iconData.length;
 }
 
-class _RollingNavBarInnerState extends State<_RollingNavBarInner> with TickerProviderStateMixin {
+class _RollingNavBarInnerState extends State<_RollingNavBarInner>
+    with TickerProviderStateMixin {
   // Data needed for any `AnimationType`
   int activeIndex;
-  Color rollerColor;
+  Color indicatorColor;
 
   // Size-based parameters
-  double maxRollerRadius;
-  double rollerRadius;
+  double maxIndicatorRadius;
+  double indicatorRadius;
 
   // Rotation-based parameters
-  double rollerRotation; // in radians
-  double rollerX;
+  double indicatorRotation; // in radians
+  double indicatorX;
   double sidesPerListItem;
 
   // Controllers for any `AnimationType`
-  AnimationController rollerAnimationController;
-  Animation<double> rollerAnimationTween;
+  AnimationController indicatorAnimationController;
+  Animation<double> indicatorAnimationTween;
 
   @override
   void initState() {
     super.initState();
     activeIndex = widget.activeIndex;
     sidesPerListItem = widget.sidesPerListItem ?? _calculateSidesPerListItem();
-    maxRollerRadius = widget.rollerRadius;
-    rollerColor = widget.colors.length > activeIndex ? widget.colors[activeIndex] : widget.colors.first;
-    rollerRadius = widget.rollerRadius;
-    rollerRotation = 0;
-    rollerX = (tabChunkWidth / 2) + (activeIndex * tabChunkWidth);
+    maxIndicatorRadius = widget.indicatorRadius;
+    indicatorColor = widget.indicatorColors.length > activeIndex
+        ? widget.indicatorColors[activeIndex]
+        : widget.indicatorColors.first;
+    indicatorRadius = widget.indicatorRadius;
+    indicatorRotation = 0;
+    indicatorX = (tabChunkWidth / 2) + (activeIndex * tabChunkWidth);
   }
 
   /// Measure of the available space for each nav item.
@@ -302,7 +339,8 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner> with TickerPro
 
   @override
   void dispose() {
-    if (rollerAnimationController != null) rollerAnimationController.dispose();
+    if (indicatorAnimationController != null)
+      indicatorAnimationController.dispose();
     super.dispose();
   }
 
@@ -320,10 +358,10 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner> with TickerPro
 
     var animationInfo = AnimationInfo(
       newIndex: newIndex,
-      numSides: widget.rollerSides,
+      numSides: widget.indicatorSides,
       oldIndex: _originalIndex,
       sidesPerListItem: sidesPerListItem,
-      startingRotation: rollerRotation,
+      startingRotation: indicatorRotation,
     );
 
     // Kick off the animation
@@ -339,92 +377,115 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner> with TickerPro
   }
 
   void _rollActiveIndicator(AnimationInfo info) {
-    double _rollerXAnimationStart = rollerX;
-    rollerAnimationController = AnimationController(
-      duration: Duration(milliseconds: widget.baseAnimationSpeed * info.indexDelta),
+    double _indicatorXAnimationStart = indicatorX;
+    indicatorAnimationController = AnimationController(
+      duration:
+          Duration(milliseconds: widget.baseAnimationSpeed * info.indexDelta),
       vsync: this,
     );
-    Animation curve = CurvedAnimation(parent: rollerAnimationController, curve: widget.animationCurve);
-    rollerAnimationTween = Tween<double>(begin: 0, end: 1).animate(curve)
+    Animation curve = CurvedAnimation(
+        parent: indicatorAnimationController, curve: widget.animationCurve);
+    indicatorAnimationTween = Tween<double>(begin: 0, end: 1).animate(curve)
       ..addListener(() {
         if (info.direction == Direction.forward) {
-          rollerRotation = info.startingRotation + (info.radiansToRotateDelta * curve.value);
+          indicatorRotation =
+              info.startingRotation + (info.radiansToRotateDelta * curve.value);
         } else {
-          rollerRotation = info.startingRotation - (info.radiansToRotateDelta * curve.value);
+          indicatorRotation =
+              info.startingRotation - (info.radiansToRotateDelta * curve.value);
         }
-        rollerX = _rollerXAnimationStart + (targetX - _rollerXAnimationStart) * curve.value;
-        rollerColor = _getRollerColor(info.oldIndex, info.newIndex, curve.value);
+        indicatorX = _indicatorXAnimationStart +
+            (targetX - _indicatorXAnimationStart) * curve.value;
+        indicatorColor = _getRollerColor(
+          info.oldIndex,
+          info.newIndex,
+          curve.value,
+        );
         setState(() {});
         if (widget.onAnimate != null) {
           var update = AnimationUpdate(
             animationValue: curve.value,
-            color: rollerColor,
+            color: indicatorColor,
             direction: info.direction,
-            percentAnimated: rollerAnimationController.value,
-            rotation: rollerRotation,
+            percentAnimated: indicatorAnimationController.value,
+            rotation: indicatorRotation,
           );
           widget.onAnimate(update);
         }
       });
 
-    rollerAnimationController.forward();
+    indicatorAnimationController.forward();
   }
 
   void _snapActiveIndicator(AnimationInfo info) {
     setState(() {
-      rollerX = targetX;
-      rollerColor = _getRollerColor(activeIndex, activeIndex, 1.0);
+      indicatorX = targetX;
+      indicatorColor = _getRollerColor(activeIndex, activeIndex, 1.0);
     });
     if (widget.onAnimate != null) {
       var update = AnimationUpdate(
         animationValue: 1,
-        color: rollerColor,
+        color: indicatorColor,
         direction: info.direction,
         percentAnimated: 1,
-        rotation: rollerRotation,
+        rotation: indicatorRotation,
       );
       widget.onAnimate(update);
     }
   }
 
-  void _spinOutInActiveIndicator(AnimationInfo info, {bool shouldRotate = true}) {
-    rollerAnimationController = AnimationController(
+  void _spinOutInActiveIndicator(AnimationInfo info,
+      {bool shouldRotate = true}) {
+    indicatorAnimationController = AnimationController(
       duration: Duration(milliseconds: widget.baseAnimationSpeed),
       vsync: this,
     );
-    double totalRadiansToRotate = 2 * pi * 2; // two full rotations per
-    Animation curve = CurvedAnimation(parent: rollerAnimationController, curve: widget.animationCurve);
-    rollerAnimationTween = Tween<double>(begin: 0, end: 1).animate(curve)
+
+    // One rotation to spin out, one to spin in
+    double totalRadiansToRotate = 2 * pi * 2;
+
+    Animation curve = CurvedAnimation(
+      parent: indicatorAnimationController,
+      curve: widget.animationCurve,
+    );
+    indicatorAnimationTween = Tween<double>(begin: 0, end: 1).animate(curve)
       ..addListener(() {
         if (curve.value < 0.5) {
           double percentToHalf = curve.value * 2;
-          rollerRadius = maxRollerRadius * (1 - percentToHalf);
+          indicatorRadius = maxIndicatorRadius * (1 - percentToHalf);
         } else {
           double percentPastHalf = (curve.value - 0.5) * 2;
-          rollerRadius = maxRollerRadius * percentPastHalf;
-          rollerX = targetX;
+          indicatorRadius = maxIndicatorRadius * percentPastHalf;
+          indicatorX = targetX;
         }
-        rollerColor = _getRollerColor(info.oldIndex, info.newIndex, curve.value);
-        rollerRotation = shouldRotate ? totalRadiansToRotate * curve.value : rollerRotation;
+        indicatorColor =
+            _getRollerColor(info.oldIndex, info.newIndex, curve.value);
+        indicatorRotation = shouldRotate
+            ? totalRadiansToRotate * curve.value
+            : indicatorRotation;
         setState(() {});
 
         if (widget.onAnimate != null) {
           var update = AnimationUpdate(
             animationValue: 1,
-            color: rollerColor,
+            color: indicatorColor,
             direction: info.direction,
-            percentAnimated: rollerAnimationController.value,
-            rotation: rollerRotation,
+            percentAnimated: indicatorAnimationController.value,
+            rotation: indicatorRotation,
           );
           widget.onAnimate(update);
         }
       });
-    rollerAnimationController.forward();
+    indicatorAnimationController.forward();
   }
 
   Color _getRollerColor(int oldIndex, int newIndex, double animationValue) {
-    if (widget.colors.length == 1) return widget.colors.first;
-    return Color.lerp(widget.colors[oldIndex], widget.colors[newIndex], animationValue);
+    if (widget.indicatorColors.length == 1) return widget.indicatorColors.first;
+    return Color.lerp(
+      widget.indicatorColors[oldIndex],
+      widget.indicatorColors[newIndex],
+      animationValue,
+    );
   }
 
   @override
@@ -438,14 +499,14 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner> with TickerPro
       child: Stack(
         children: <Widget>[
           _ActiveIndicator(
-            centerX: rollerX - rollerRadius,
-            centerY: (widget.height / 2) - rollerRadius,
-            color: rollerColor,
-            cornerRadius: widget.rollerCornerRadius,
-            height: rollerRadius * 2,
-            numSides: widget.rollerSides,
-            rotation: rollerRotation,
-            width: rollerRadius * 2,
+            centerX: indicatorX - indicatorRadius,
+            centerY: (widget.height / 2) - indicatorRadius,
+            color: indicatorColor,
+            cornerRadius: widget.indicatorCornerRadius,
+            height: indicatorRadius * 2,
+            numSides: widget.indicatorSides,
+            rotation: indicatorRotation,
+            width: indicatorRadius * 2,
           ),
           Positioned(
             height: widget.height,
@@ -463,7 +524,7 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner> with TickerPro
   }
 
   Widget _buildNavBarItem(Indexed indexed) {
-    return _RollerBarItem(
+    return _NavBarItem(
       indexed.value,
       isActive: activeIndex == indexed.index,
       onPressed: () {
@@ -472,25 +533,39 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner> with TickerPro
     );
   }
 
-  Color _getActiveIconColor(int activeIndex) {
+  /// Because `widget.colors` can either have a matching length as the children
+  /// count, or simply 1 item which stands for a full list of the same color,
+  /// we have to make this check.
+  int get colorIndex =>
+      widget.indicatorColors.length == widget.numChildren ? activeIndex : 1;
+
+  /// Because `widget.activeIconColors` can either have a matching length as the
+  /// children count, or simply 1 item which stands for a full list of the same
+  /// color, we have to make this check.
+  int get activeIconColorIndex =>
+      widget.activeIconColors.length == widget.numChildren ? activeIndex : 1;
+
+  Color _getActiveIconColor() {
     if (widget.activeIconColors == null) {
-      return TinyColor(widget.colors[activeIndex]).lighten(30).color;
+      return TinyColor(widget.indicatorColors[colorIndex]).lighten(30).color;
     }
-    return widget.activeIconColors.length == widget.numChildren
-        ? widget.activeIconColors[activeIndex]
-        : widget.activeIconColors.first;
+    return widget.activeIconColors[activeIconColorIndex];
   }
 
   Color _getInactiveIconColor(int index) {
-    return widget.iconColors.length == widget.numChildren ? widget.iconColors[index] : widget.iconColors.first;
+    return widget.iconColors.length == widget.numChildren
+        ? widget.iconColors[index]
+        : widget.iconColors.first;
   }
 
   Widget _buildNavBarIcon(Indexed indexed) {
     final bool isActive = activeIndex == indexed.index;
-    return _RollerBarItem(
+    return _NavBarItem(
       Icon(
         indexed.value,
-        color: isActive ? _getActiveIconColor(indexed.index) : _getInactiveIconColor(indexed.index),
+        color: isActive
+            ? _getActiveIconColor()
+            : _getInactiveIconColor(indexed.index),
         size: widget.iconSize,
       ),
       onPressed: () {
@@ -502,11 +577,11 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner> with TickerPro
 }
 
 /// Foreground widget for each nav bar item.
-class _RollerBarItem extends StatelessWidget {
+class _NavBarItem extends StatelessWidget {
   final Widget child;
   final bool isActive;
   final Function onPressed;
-  const _RollerBarItem(
+  const _NavBarItem(
     this.child, {
     @required this.onPressed,
     this.isActive = false,
@@ -524,7 +599,7 @@ class _RollerBarItem extends StatelessWidget {
   }
 }
 
-/// Colorful indicator for each [_RollerBarItem] that animates back and forth
+/// Colorful indicator for each [_NavBarItem] that animates back and forth
 /// across the screen as the user taps.
 class _ActiveIndicator extends StatelessWidget {
   final double centerX;

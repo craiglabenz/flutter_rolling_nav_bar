@@ -62,7 +62,9 @@ class _MyAppState extends State<MyApp> {
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 70,
-                                fontFeatures: <FontFeature>[FontFeature.enable('smcp')],
+                                fontFeatures: <FontFeature>[
+                                  FontFeature.enable('smcp')
+                                ],
                                 shadows: <Shadow>[
                                   Shadow(
                                     offset: Offset(5, 5),
@@ -92,13 +94,6 @@ class _MyAppState extends State<MyApp> {
                     animationCurve: Curves.linear,
                     animationType: AnimationType.roll,
                     baseAnimationSpeed: 200,
-                    colors: <Color>[
-                      Colors.red,
-                      Colors.orange,
-                      Colors.green,
-                      Colors.blue,
-                      Colors.purple,
-                    ],
                     iconData: <IconData>[
                       Icons.home,
                       Icons.people,
@@ -106,9 +101,16 @@ class _MyAppState extends State<MyApp> {
                       Icons.chat,
                       Icons.settings,
                     ],
+                    indicatorColors: <Color>[
+                      Colors.red,
+                      Colors.orange,
+                      Colors.green,
+                      Colors.blue,
+                      Colors.purple,
+                    ],
                     iconSize: 25,
+                    indicatorRadius: 30,
                     onAnimate: _onAnimate,
-                    rollerRadius: 30,
                   ),
 
                   // Option 2: More work, but there if you need it
