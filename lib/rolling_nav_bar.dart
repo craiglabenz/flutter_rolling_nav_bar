@@ -139,6 +139,9 @@ class RollingNavBar extends StatelessWidget {
   /// Optional custom size for each tab bar icon.
   final double iconSize;
 
+  /// Optional list of text widgets to display beneath inactive icons.
+  final List<Widget> iconText;
+
   /// Optional list of colors for the active indicator. If supplied, must have a
   /// length of one or the same length as [iconData]. A length of 1 indicates a
   /// single color for all tabs.
@@ -185,6 +188,7 @@ class RollingNavBar extends StatelessWidget {
         iconColors = null,
         iconData = null,
         iconSize = null,
+        iconText = null,
         assert(indicatorSides > 2);
   RollingNavBar.iconData({
     this.activeIconColors,
@@ -195,6 +199,7 @@ class RollingNavBar extends StatelessWidget {
     this.iconColors = const <Color>[Colors.black],
     this.iconData,
     this.iconSize,
+    this.iconText,
     this.indicatorColors = const <Color>[Colors.pink],
     this.indicatorCornerRadius = 10,
     this.indicatorRadius = 25,
@@ -204,6 +209,7 @@ class RollingNavBar extends StatelessWidget {
     this.onTap,
     this.sidesPerListItem,
   })  : children = null,
+        assert(iconText == null || iconText.length == iconData.length),
         assert(indicatorSides > 2),
         assert(activeIconColors == null ||
             activeIconColors.length == 1 ||
@@ -227,6 +233,7 @@ class RollingNavBar extends StatelessWidget {
           iconColors: iconColors,
           iconData: iconData,
           iconSize: iconSize,
+          iconText: iconText,
           indicatorColors: indicatorColors,
           indicatorCornerRadius: indicatorCornerRadius,
           indicatorRadius: indicatorRadius,
@@ -251,6 +258,7 @@ class _RollingNavBarInner extends StatefulWidget {
   final List<Widget> children;
   final List<Color> iconColors;
   final List<IconData> iconData;
+  final List<Widget> iconText;
   final List<Color> indicatorColors;
   final double indicatorCornerRadius;
   final double indicatorRadius;
@@ -272,6 +280,7 @@ class _RollingNavBarInner extends StatefulWidget {
     @required this.iconColors,
     @required this.iconData,
     @required this.iconSize,
+    @required this.iconText,
     @required this.indicatorColors,
     @required this.indicatorCornerRadius,
     @required this.indicatorRadius,
@@ -524,9 +533,11 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
   }
 
   Widget _buildNavBarItem(Indexed indexed) {
+    print(tabChunkWidth);
     return _NavBarItem(
       indexed.value,
       isActive: activeIndex == indexed.index,
+      maxWidth: tabChunkWidth,
       onPressed: () {
         _setActive(indexed.index);
       },
@@ -568,10 +579,14 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
             : _getInactiveIconColor(indexed.index),
         size: widget.iconSize,
       ),
+      isActive: isActive,
+      maxWidth: tabChunkWidth,
       onPressed: () {
         _setActive(indexed.index);
       },
-      isActive: isActive,
+      textWidget: !isActive && widget.iconText.length == widget.numChildren
+          ? widget.iconText[indexed.index]
+          : null,
     );
   }
 }
@@ -581,10 +596,14 @@ class _NavBarItem extends StatelessWidget {
   final Widget child;
   final bool isActive;
   final Function onPressed;
+  final double maxWidth;
+  final Widget textWidget;
   const _NavBarItem(
     this.child, {
     @required this.onPressed,
     this.isActive = false,
+    this.maxWidth,
+    this.textWidget,
     Key key,
   }) : super(key: key);
 
@@ -593,7 +612,14 @@ class _NavBarItem extends StatelessWidget {
     return GestureDetector(
       onTap: onPressed,
       child: Container(
-        child: child,
+        width: maxWidth,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            child,
+            textWidget ?? Container(),
+          ],
+        ),
       ),
     );
   }

@@ -1,3 +1,7 @@
+## [0.0.1-alpha-3] - 2019-12-17
+
+* Added support for icon text
+
 ## [0.0.1-alpha-2] - 2019-12-17
 
 * More README clarifications

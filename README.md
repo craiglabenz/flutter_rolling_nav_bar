@@ -171,3 +171,30 @@ are also exposed.
 
 In the demo, the background of the larger hexagon matches the background of
 the nav bar hexagon. To achieve this and similar effects, two callbacks, `onTap` and `onAnimate` are available. `onAnimate` can be particularly helpful for syncing visual effects elsewhere in your app with nav bar progress.
+
+
+## Tab Item Text
+
+If using the `iconData` constructor, you are also able to pass a list of widgets
+to render as text below inactive icons.
+
+```dart
+RollingNavBar.iconData(
+  // A list of length one implies the same color for all icons
+  iconColors: <Color>[
+    Colors.grey[800],
+  ],
+  iconData: <IconData>[
+    Icons.home,
+    Icons.friends,
+    Icons.settings,
+  ],
+  iconText: <Widget>[
+    Text('Home', style: TextStyle(color: Colors.grey, fontSize: 12)),
+    Text('Friends', style: TextStyle(color: Colors.grey, fontSize: 12)),
+    Text('Settings', style: TextStyle(color: Colors.grey, fontSize: 12)),
+  ]
+)
+```
+
+<img src="https://raw.githubusercontent.com/craiglabenz/flutter_rolling_nav_bar/master/doc/assets/iconText.png" alt="Icon Text Example" height="600" />
