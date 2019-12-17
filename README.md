@@ -48,15 +48,15 @@ of `Color` objects.
 
 ```dart
 RollingNavBar.iconData(
-  colors: <Color>[
-    Colors.red,
-    Colors.yellow,
-    Colors.blue,
-  ],
   iconData: <IconData>[
     Icons.home,
     Icons.people,
     Icons.settings,
+  ],
+  indicatorColors: <Color>[
+    Colors.red,
+    Colors.yellow,
+    Colors.blue,
   ],
 )
 ```
@@ -71,7 +71,7 @@ RollingNavBar.children(
     Text('2', style: TextStyle(color: Colors.grey)),
     Text('3', style: TextStyle(color: Colors.grey)),
   ],
-  colors: <Color>[
+  indicatorColors: <Color>[
     Colors.red,
     Colors.yellow,
     Colors.blue,

@@ -1,3 +1,7 @@
+## [0.0.1-alpha-2] - 2019-12-17
+
+* More README clarifications
+
 ## [0.0.1-alpha-1] - 2019-12-17
 
 * Variable name clean-up and other documentation enhancements
