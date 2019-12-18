@@ -171,11 +171,11 @@ class RollingNavBar extends StatelessWidget {
   final double sidesPerListItem;
 
   RollingNavBar.children({
+    @required this.children,
     this.activeIndex = 0,
     this.animationCurve = Curves.linear,
     this.animationType = AnimationType.roll,
     this.baseAnimationSpeed = 200,
-    this.children,
     this.indicatorColors = const <Color>[Colors.black],
     this.indicatorCornerRadius = 10,
     this.indicatorRadius = 25,
@@ -191,13 +191,13 @@ class RollingNavBar extends StatelessWidget {
         iconText = null,
         assert(indicatorSides > 2);
   RollingNavBar.iconData({
+    @required this.iconData,
     this.activeIconColors,
     this.activeIndex = 0,
     this.animationCurve = Curves.linear,
     this.animationType = AnimationType.roll,
     this.baseAnimationSpeed = 200,
     this.iconColors = const <Color>[Colors.black],
-    this.iconData,
     this.iconSize,
     this.iconText,
     this.indicatorColors = const <Color>[Colors.pink],
@@ -507,7 +507,7 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
           ),
       child: Stack(
         children: <Widget>[
-          _ActiveIndicator(
+          ActiveIndicator(
             centerX: indicatorX - indicatorRadius,
             centerY: (widget.height / 2) - indicatorRadius,
             color: indicatorColor,
@@ -533,7 +533,6 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
   }
 
   Widget _buildNavBarItem(Indexed indexed) {
-    print(tabChunkWidth);
     return _NavBarItem(
       indexed.value,
       isActive: activeIndex == indexed.index,
@@ -548,13 +547,13 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
   /// count, or simply 1 item which stands for a full list of the same color,
   /// we have to make this check.
   int get colorIndex =>
-      widget.indicatorColors.length == widget.numChildren ? activeIndex : 1;
+      widget.indicatorColors.length == widget.numChildren ? activeIndex : 0;
 
   /// Because `widget.activeIconColors` can either have a matching length as the
   /// children count, or simply 1 item which stands for a full list of the same
   /// color, we have to make this check.
   int get activeIconColorIndex =>
-      widget.activeIconColors.length == widget.numChildren ? activeIndex : 1;
+      widget.activeIconColors.length == widget.numChildren ? activeIndex : 0;
 
   Color _getActiveIconColor() {
     if (widget.activeIconColors == null) {
@@ -629,7 +628,7 @@ class _NavBarItem extends StatelessWidget {
 
 /// Colorful indicator for each [_NavBarItem] that animates back and forth
 /// across the screen as the user taps.
-class _ActiveIndicator extends StatelessWidget {
+class ActiveIndicator extends StatelessWidget {
   final double centerX;
   final double centerY;
   final Color color;
@@ -638,7 +637,7 @@ class _ActiveIndicator extends StatelessWidget {
   final double width;
   final double rotation;
   final int numSides;
-  const _ActiveIndicator({
+  const ActiveIndicator({
     @required this.centerX,
     @required this.centerY,
     @required this.color,

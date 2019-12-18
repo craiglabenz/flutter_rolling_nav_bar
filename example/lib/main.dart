@@ -20,6 +20,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
   }
 
+  // ignore: unused_element
   _onAnimate(AnimationUpdate update) {
     setState(() {
       logoColor = update.color;

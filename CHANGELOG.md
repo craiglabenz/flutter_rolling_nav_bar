@@ -1,3 +1,8 @@
+## [0.0.1-alpha+4] - 2019-12-17
+
+* Fixed bug with null error when not passing `iconText`
+* Added general sanity tests
+
 ## [0.0.1-alpha-3] - 2019-12-17
 
 * Added support for icon text
