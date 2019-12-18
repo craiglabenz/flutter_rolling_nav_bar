@@ -584,7 +584,9 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
       onPressed: () {
         _setActive(indexed.index);
       },
-      textWidget: !isActive && widget.iconText.length == widget.numChildren
+      textWidget: widget.iconText != null &&
+              !isActive &&
+              widget.iconText.length == widget.numChildren
           ? widget.iconText[indexed.index]
           : null,
     );
