@@ -301,6 +301,7 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
     with TickerProviderStateMixin {
   // Data needed for any `AnimationType`
   int activeIndex;
+  int widgetActiveIndex;
   Color indicatorColor;
 
   // Size-based parameters
@@ -319,6 +320,7 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
   @override
   void initState() {
     super.initState();
+    widgetActiveIndex = widget.activeIndex;
     activeIndex = widget.activeIndex;
     sidesPerListItem = widget.sidesPerListItem ?? _calculateSidesPerListItem();
     maxIndicatorRadius = widget.indicatorRadius;
@@ -589,6 +591,17 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
           ? widget.iconText[indexed.index]
           : null,
     );
+  }
+
+  @override
+  void didUpdateWidget(Widget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widgetActiveIndex != widget.activeIndex) {
+      setState(() {
+        widgetActiveIndex = widget.activeIndex;
+        _setActive(widget.activeIndex);
+      });
+    }
   }
 }
 

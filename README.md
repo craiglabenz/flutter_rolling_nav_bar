@@ -198,3 +198,39 @@ RollingNavBar.iconData(
 ```
 
 <img src="https://raw.githubusercontent.com/craiglabenz/flutter_rolling_nav_bar/master/doc/assets/iconText.png" alt="Icon Text Example" height="600" />
+
+
+## Driving Navigation Bar Changes
+
+You can programmatically change the active navigation bar tab by passing a new `activeIndex` to the `RollingNavBar` widget. However, there are two steps to successfully keeping everything in sync.
+
+```dart
+class _MyAppState extends State<MyApp> {
+  int activeIndex;
+
+  /// Handler that keeps the parent widget in sync with
+  /// the child `RollingNavBar` widget's changes driven
+  /// by user interactions.
+  void _onTap(int index) {
+    // Do not call `setState()`!
+    activeIndex = index;
+  }
+
+  /// Handler for when you want to programmatically change
+  /// the active index. Calling `setState()` here causes
+  /// Flutter to re-render the tree. `RollingNavBar` will
+  /// respond by running its normal animation.
+  void changeActiveIndex(int index) {
+    setState((){
+      activeIndex = index;
+    });
+  }
+
+  Widget build(BuildContext context) {
+    return RollingNavBar.iconData(
+      activeIndex: activeIndex,
+      iconData: iconData,
+    );
+  }
+}
+```

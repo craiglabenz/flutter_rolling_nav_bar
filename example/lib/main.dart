@@ -13,11 +13,36 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   Color logoColor;
+  int activeIndex;
+
+  var iconData = <IconData>[
+    Icons.home,
+    Icons.people,
+    Icons.account_circle,
+    Icons.chat,
+    Icons.settings,
+  ];
+
+  var iconText = <Widget>[
+    Text('Home', style: TextStyle(color: Colors.grey, fontSize: 12)),
+    Text('Friends', style: TextStyle(color: Colors.grey, fontSize: 12)),
+    Text('Account', style: TextStyle(color: Colors.grey, fontSize: 12)),
+    Text('Chat', style: TextStyle(color: Colors.grey, fontSize: 12)),
+    Text('Settings', style: TextStyle(color: Colors.grey, fontSize: 12)),
+  ];
 
   @override
   void initState() {
     logoColor = Colors.red[600];
+    activeIndex = 0;
     super.initState();
+  }
+
+  void incrementIndex() {
+    setState(() {
+      activeIndex = activeIndex < iconData.length ? activeIndex + 1 : 0;
+      print(activeIndex);
+    });
   }
 
   // ignore: unused_element
@@ -25,6 +50,10 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       logoColor = update.color;
     });
+  }
+
+  _onTap(int index) {
+    activeIndex = index;
   }
 
   @override
@@ -45,39 +74,42 @@ class _MyAppState extends State<MyApp> {
                   top: 100,
                   height: 414,
                   width: MediaQuery.of(context).size.width,
-                  child: ClipPolygon(
-                    sides: 6,
-                    borderRadius: 15,
-                    child: Container(
-                      height: MediaQuery.of(context).size.width,
-                      width: MediaQuery.of(context).size.width,
-                      color: logoColor,
-                      child: Center(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(0, 140, 30, 0),
-                          child: Transform(
-                            transform: Matrix4.skew(0.1, -0.55),
-                            child: Text(
-                              'Rolling\nNav Bar',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 70,
-                                fontFeatures: <FontFeature>[
-                                  FontFeature.enable('smcp')
-                                ],
-                                shadows: <Shadow>[
-                                  Shadow(
-                                    offset: Offset(5, 5),
-                                    blurRadius: 3.0,
-                                    color: Color.fromARGB(255, 0, 0, 0),
-                                  ),
-                                  Shadow(
-                                    offset: Offset(5, 5),
-                                    blurRadius: 8.0,
-                                    color: Color.fromARGB(125, 0, 0, 255),
-                                  ),
-                                ],
+                  child: GestureDetector(
+                    onTap: incrementIndex,
+                    child: ClipPolygon(
+                      sides: 6,
+                      borderRadius: 15,
+                      child: Container(
+                        height: MediaQuery.of(context).size.width,
+                        width: MediaQuery.of(context).size.width,
+                        color: logoColor,
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 140, 30, 0),
+                            child: Transform(
+                              transform: Matrix4.skew(0.1, -0.55),
+                              child: Text(
+                                'Rolling\nNav Bar',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 70,
+                                  fontFeatures: <FontFeature>[
+                                    FontFeature.enable('smcp')
+                                  ],
+                                  shadows: <Shadow>[
+                                    Shadow(
+                                      offset: Offset(5, 5),
+                                      blurRadius: 3.0,
+                                      color: Color.fromARGB(255, 0, 0, 0),
+                                    ),
+                                    Shadow(
+                                      offset: Offset(5, 5),
+                                      blurRadius: 8.0,
+                                      color: Color.fromARGB(125, 0, 0, 255),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -92,29 +124,13 @@ class _MyAppState extends State<MyApp> {
                   width: MediaQuery.of(context).size.width,
                   // Option 1: Recommended
                   child: RollingNavBar.iconData(
+                    activeIndex: activeIndex,
                     animationCurve: Curves.linear,
                     animationType: AnimationType.roll,
                     baseAnimationSpeed: 200,
-                    iconData: <IconData>[
-                      Icons.home,
-                      Icons.people,
-                      Icons.account_circle,
-                      Icons.chat,
-                      Icons.settings,
-                    ],
+                    iconData: iconData,
                     iconColors: <Color>[Colors.grey[800]],
-                    iconText: <Widget>[
-                      Text('Home',
-                          style: TextStyle(color: Colors.grey, fontSize: 12)),
-                      Text('Friends',
-                          style: TextStyle(color: Colors.grey, fontSize: 12)),
-                      Text('Account',
-                          style: TextStyle(color: Colors.grey, fontSize: 12)),
-                      Text('Chat',
-                          style: TextStyle(color: Colors.grey, fontSize: 12)),
-                      Text('Settings',
-                          style: TextStyle(color: Colors.grey, fontSize: 12)),
-                    ],
+                    iconText: iconText,
                     indicatorColors: <Color>[
                       Colors.red,
                       Colors.orange,
@@ -125,6 +141,7 @@ class _MyAppState extends State<MyApp> {
                     iconSize: 25,
                     indicatorRadius: 30,
                     onAnimate: _onAnimate,
+                    onTap: _onTap,
                   ),
 
                   // Option 2: More work, but there if you need it
