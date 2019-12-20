@@ -40,7 +40,7 @@ class _MyAppState extends State<MyApp> {
 
   void incrementIndex() {
     setState(() {
-      activeIndex = activeIndex < iconData.length ? activeIndex + 1 : 0;
+      activeIndex = activeIndex < (iconData.length - 1) ? activeIndex + 1 : 0;
       print(activeIndex);
     });
   }
