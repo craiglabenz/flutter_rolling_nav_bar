@@ -1,3 +1,7 @@
+## [0.0.1-alpha+5] - 2019-12-19
+
+* Added ability to programmatically drive new nav bar index
+
 ## [0.0.1-alpha+4] - 2019-12-17
 
 * Fixed bug with null error when not passing `iconText`
