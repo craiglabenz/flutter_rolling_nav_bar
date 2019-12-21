@@ -105,7 +105,7 @@ RollingNavBar.iconData(
 
 ---
 
-The second animation type is is a fade-and-reappear effect:
+The second animation type is a fade-and-reappear effect:
 
 ```dart
 RollingNavBar.iconData(
@@ -122,7 +122,7 @@ RollingNavBar.iconData(
 
 <br>
 
-> Note: For the `shinkOutIn` animation type, theyour supplied animation speed is constant, since the active indicator never travels the intermediate distance.
+> Note: For the `shinkOutIn` animation type, your supplied animation speed is constant, since the active indicator never travels the intermediate distance.
 
 ---
 
@@ -163,14 +163,13 @@ RollingNavBar.iconData(
 
 <br>
 
-In addition to the above options, `animationCurve` and `baseAnimationSpeed` parameters
-are also exposed.
-
 
 ## Hooking into the animation
 
 In the demo, the background of the larger hexagon matches the background of
-the nav bar hexagon. To achieve this and similar effects, two callbacks, `onTap` and `onAnimate` are available. `onAnimate` can be particularly helpful for syncing visual effects elsewhere in your app with nav bar progress.
+the nav bar hexagon. To achieve this and similar effects, two callbacks, `onTap` and
+`onAnimate`, are available. `onAnimate` can be particularly helpful for syncing
+visual effects elsewhere in your app with nav bar progress.
 
 
 ## Tab Item Text
@@ -208,9 +207,8 @@ You can programmatically change the active navigation bar tab by passing a new `
 class _MyAppState extends State<MyApp> {
   int activeIndex;
 
-  /// Handler that keeps the parent widget in sync with
-  /// the child `RollingNavBar` widget's changes driven
-  /// by user interactions.
+  /// Handler that responds to navigation events (likely derived
+  /// from user clicks) and keeps the parent in sync.
   void _onTap(int index) {
     // Do not call `setState()`!
     activeIndex = index;
@@ -218,8 +216,8 @@ class _MyAppState extends State<MyApp> {
 
   /// Handler for when you want to programmatically change
   /// the active index. Calling `setState()` here causes
-  /// Flutter to re-render the tree. `RollingNavBar` will
-  /// respond by running its normal animation.
+  /// Flutter to re-render the tree, which `RollingNavBar`
+  /// responds to by running its normal animation.
   void changeActiveIndex(int index) {
     setState((){
       activeIndex = index;
@@ -230,6 +228,7 @@ class _MyAppState extends State<MyApp> {
     return RollingNavBar.iconData(
       activeIndex: activeIndex,
       iconData: iconData,
+      onTap: _onTap,
     );
   }
 }
