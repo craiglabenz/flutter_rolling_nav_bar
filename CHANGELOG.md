@@ -1,3 +1,7 @@
+## [0.0.1-alpha+6] - 2019-12-19
+
+* Fixed typos. Functionally equivalent to 0.0.1-alpha+5
+
 ## [0.0.1-alpha+5] - 2019-12-19
 
 * Added ability to programmatically drive new nav bar index
