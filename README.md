@@ -198,6 +198,30 @@ RollingNavBar.iconData(
 
 <img src="https://raw.githubusercontent.com/craiglabenz/flutter_rolling_nav_bar/master/doc/assets/iconText.png" alt="Icon Text Example" height="600" />
 
+## Icon badges
+
+Using the [Badges](https://pub.dev/packages/badges) library, `RollingNavBar` is able to easily expose nav bar badges. The following works with either constructor.
+
+```dart
+RollingNavBar.iconData(
+  badges: <Widget>[
+    Text('1', style: TextStyle(Colors.white)),
+    Text('1', style: TextStyle(Colors.white)),
+    null,
+    null,
+    Text('1', style: TextStyle(Colors.white)),
+  ],
+  iconData: <IconData>[
+    Icons.home,
+    Icons.friends,
+    Icons.account,
+    Icons.chat,
+    Icons.settings,
+  ],
+```
+
+<img src="https://raw.githubusercontent.com/craiglabenz/flutter_rolling_nav_bar/master/doc/assets/badges.png" alt="Badges Example" height="600" />
+
 
 ## Driving Navigation Bar Changes
 

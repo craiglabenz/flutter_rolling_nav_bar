@@ -1,5 +1,7 @@
 import 'dart:math';
+
 import 'indexed.dart';
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:polygon_clipper/polygon_clipper.dart';
 import 'package:tinycolor/tinycolor.dart';
@@ -112,6 +114,10 @@ class RollingNavBar extends StatelessWidget {
   /// Optional set of colors of each icon to display when in the active state.
   final List<Color> activeIconColors;
 
+  /// Optional list of badges to apply to each nav item. [null] placeholders
+  /// in the list are necessary for unbadged tab bar items.
+  final List<Widget> badges;
+
   /// Initial tab in the highlighted state.
   final int activeIndex;
 
@@ -175,6 +181,7 @@ class RollingNavBar extends StatelessWidget {
     this.activeIndex = 0,
     this.animationCurve = Curves.linear,
     this.animationType = AnimationType.roll,
+    this.badges,
     this.baseAnimationSpeed = 200,
     this.indicatorColors = const <Color>[Colors.black],
     this.indicatorCornerRadius = 10,
@@ -189,6 +196,7 @@ class RollingNavBar extends StatelessWidget {
         iconData = null,
         iconSize = null,
         iconText = null,
+        assert(badges == null || badges.length == children.length),
         assert(indicatorSides > 2);
   RollingNavBar.iconData({
     @required this.iconData,
@@ -196,6 +204,7 @@ class RollingNavBar extends StatelessWidget {
     this.activeIndex = 0,
     this.animationCurve = Curves.linear,
     this.animationType = AnimationType.roll,
+    this.badges,
     this.baseAnimationSpeed = 200,
     this.iconColors = const <Color>[Colors.black],
     this.iconSize,
@@ -214,6 +223,7 @@ class RollingNavBar extends StatelessWidget {
         assert(activeIconColors == null ||
             activeIconColors.length == 1 ||
             activeIconColors.length == iconData.length),
+        assert(badges == null || badges.length == iconData.length),
         assert(iconColors.length == 1 || iconColors.length == iconData.length),
         assert(indicatorColors.length == 1 ||
             indicatorColors.length == iconData.length);
@@ -226,6 +236,7 @@ class RollingNavBar extends StatelessWidget {
           activeIconColors: activeIconColors,
           activeIndex: activeIndex,
           animationCurve: animationCurve,
+          badges: badges,
           baseAnimationSpeed: baseAnimationSpeed,
           height: constraints.maxHeight,
           width: constraints.maxWidth,
@@ -253,6 +264,7 @@ class _RollingNavBarInner extends StatefulWidget {
   final int activeIndex;
   final Curve animationCurve;
   final AnimationType animationType;
+  final List<Widget> badges;
   final int baseAnimationSpeed;
   final double height;
   final List<Widget> children;
@@ -274,6 +286,7 @@ class _RollingNavBarInner extends StatefulWidget {
     @required this.activeIndex,
     @required this.animationCurve,
     @required this.animationType,
+    @required this.badges,
     @required this.baseAnimationSpeed,
     @required this.children,
     @required this.height,
@@ -537,6 +550,10 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
   Widget _buildNavBarItem(Indexed indexed) {
     return _NavBarItem(
       indexed.value,
+      badge: widget.badges != null && widget.badges.length >= indexed.index + 1
+          ? widget.badges[indexed.index]
+          : null,
+      badgeColor: _getBadgeColor(indexed.index),
       isActive: activeIndex == indexed.index,
       maxWidth: tabChunkWidth,
       onPressed: () {
@@ -570,6 +587,14 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
         : widget.iconColors.first;
   }
 
+  Color _getBadgeColor(int index) {
+    int inactiveIndex =
+        widget.indicatorColors.length >= (index + 1) ? index : 0;
+    return activeIndex == index
+        ? TinyColor(widget.indicatorColors[colorIndex]).lighten(30).color
+        : widget.indicatorColors[inactiveIndex];
+  }
+
   Widget _buildNavBarIcon(Indexed indexed) {
     final bool isActive = activeIndex == indexed.index;
     return _NavBarItem(
@@ -580,6 +605,10 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
             : _getInactiveIconColor(indexed.index),
         size: widget.iconSize,
       ),
+      badge: widget.badges != null && widget.badges.length >= indexed.index + 1
+          ? widget.badges[indexed.index]
+          : null,
+      badgeColor: _getBadgeColor(indexed.index),
       isActive: isActive,
       maxWidth: tabChunkWidth,
       onPressed: () {
@@ -607,6 +636,8 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
 
 /// Foreground widget for each nav bar item.
 class _NavBarItem extends StatelessWidget {
+  final Widget badge;
+  final Color badgeColor;
   final Widget child;
   final bool isActive;
   final Function onPressed;
@@ -615,6 +646,8 @@ class _NavBarItem extends StatelessWidget {
   const _NavBarItem(
     this.child, {
     @required this.onPressed,
+    this.badge,
+    this.badgeColor,
     this.isActive = false,
     this.maxWidth,
     this.textWidget,
@@ -630,12 +663,36 @@ class _NavBarItem extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            child,
+            _OptionalBadge(
+              badge: badge,
+              child: child,
+              color: badgeColor,
+            ),
             textWidget ?? Container(),
           ],
         ),
       ),
     );
+  }
+}
+
+class _OptionalBadge extends StatelessWidget {
+  final Widget badge;
+  final Widget child;
+  final Color color;
+  _OptionalBadge({this.badge, this.child, this.color, Key key})
+      : assert(child != null),
+        super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return badge != null
+        ? Badge(
+            badgeColor: color,
+            badgeContent: badge,
+            child: child,
+          )
+        : child;
   }
 }
 

@@ -5,6 +5,14 @@ import 'package:rolling_nav_bar/rolling_nav_bar.dart';
 
 void main() => runApp(MyApp());
 
+double scaledHeight(BuildContext context, double baseSize) {
+  return baseSize * (MediaQuery.of(context).size.height / 800);
+}
+
+double scaledWidth(BuildContext context, double baseSize) {
+  return baseSize * (MediaQuery.of(context).size.width / 375);
+}
+
 class MyApp extends StatefulWidget {
   // This widget is the root of your application.
   @override
@@ -68,24 +76,31 @@ class _MyAppState extends State<MyApp> {
         ),
         body: Builder(
           builder: (BuildContext context) {
+            double largeIconHeight = MediaQuery.of(context).size.width;
+            double navBarHeight = scaledHeight(context, 95);
+            double topOffset = (MediaQuery.of(context).size.height -
+                    largeIconHeight -
+                    MediaQuery.of(context).viewInsets.top -
+                    (navBarHeight * 2)) /
+                2;
             return Stack(
               children: <Widget>[
                 Positioned(
-                  top: 100,
-                  height: 414,
-                  width: MediaQuery.of(context).size.width,
+                  top: topOffset,
+                  height: largeIconHeight,
+                  width: largeIconHeight,
                   child: GestureDetector(
                     onTap: incrementIndex,
                     child: ClipPolygon(
                       sides: 6,
                       borderRadius: 15,
                       child: Container(
-                        height: MediaQuery.of(context).size.width,
-                        width: MediaQuery.of(context).size.width,
+                        height: largeIconHeight,
+                        width: largeIconHeight,
                         color: logoColor,
                         child: Center(
                           child: Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 140, 30, 0),
+                            padding: EdgeInsets.fromLTRB(0, 100, 30, 0),
                             child: Transform(
                               transform: Matrix4.skew(0.1, -0.55),
                               child: Text(
@@ -93,7 +108,7 @@ class _MyAppState extends State<MyApp> {
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 70,
+                                  fontSize: scaledWidth(context, 63),
                                   fontFeatures: <FontFeature>[
                                     FontFeature.enable('smcp')
                                   ],
@@ -120,7 +135,7 @@ class _MyAppState extends State<MyApp> {
                 ),
                 Positioned(
                   bottom: 0,
-                  height: 95,
+                  height: navBarHeight,
                   width: MediaQuery.of(context).size.width,
                   // Option 1: Recommended
                   child: RollingNavBar.iconData(
@@ -128,6 +143,13 @@ class _MyAppState extends State<MyApp> {
                     animationCurve: Curves.linear,
                     animationType: AnimationType.roll,
                     baseAnimationSpeed: 200,
+                    badges: <Widget>[
+                      Text('1', style: TextStyle(color: Colors.white)),
+                      Text('1', style: TextStyle(color: Colors.white)),
+                      null,
+                      null,
+                      Text('1', style: TextStyle(color: Colors.white)),
+                    ],
                     iconData: iconData,
                     iconColors: <Color>[Colors.grey[800]],
                     iconText: iconText,
@@ -139,13 +161,18 @@ class _MyAppState extends State<MyApp> {
                       Colors.purple,
                     ],
                     iconSize: 25,
-                    indicatorRadius: 30,
+                    indicatorRadius: scaledHeight(context, 30),
                     onAnimate: _onAnimate,
                     onTap: _onTap,
                   ),
 
                   // Option 2: More work, but there if you need it
                   // child: RollingNavBar.children(
+                  //   badges: <Widget>[
+                  //     null,
+                  //     Text('1', style: TextStyle(color: Colors.white)),
+                  //     null,
+                  //   ],
                   //   children: <Widget>[
                   //     Text('1', style: TextStyle(color: Colors.grey)),
                   //     Text('2', style: TextStyle(color: Colors.grey)),

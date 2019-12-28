@@ -1,3 +1,7 @@
+## [0.0.1-alpha+7] - 2019-12-28
+
+* Added support for icon badges
+
 ## [0.0.1-alpha+6] - 2019-12-19
 
 * Fixed typos. Functionally equivalent to 0.0.1-alpha+5
