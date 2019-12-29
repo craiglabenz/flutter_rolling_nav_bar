@@ -1,3 +1,7 @@
+## [0.0.1-alpha+8] - 2019-12-28
+
+* Added customization for badge colors
+
 ## [0.0.1-alpha+7] - 2019-12-28
 
 * Added support for icon badges

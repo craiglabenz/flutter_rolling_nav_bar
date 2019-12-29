@@ -111,6 +111,9 @@ class AnimationUpdate {
 /// [StatefulWidget] for the purposes of introducing a [LayoutBuilder] in the
 /// render pipeline.
 class RollingNavBar extends StatelessWidget {
+  /// Optional set of colors for badges while above the active indicator.
+  final List<Color> activeBadgeColors;
+
   /// Optional set of colors of each icon to display when in the active state.
   final List<Color> activeIconColors;
 
@@ -178,6 +181,7 @@ class RollingNavBar extends StatelessWidget {
 
   RollingNavBar.children({
     @required this.children,
+    this.activeBadgeColors,
     this.activeIndex = 0,
     this.animationCurve = Curves.linear,
     this.animationType = AnimationType.roll,
@@ -196,10 +200,14 @@ class RollingNavBar extends StatelessWidget {
         iconData = null,
         iconSize = null,
         iconText = null,
+        assert(activeBadgeColors == null ||
+            activeBadgeColors.length == 1 ||
+            activeBadgeColors.length == children.length),
         assert(badges == null || badges.length == children.length),
         assert(indicatorSides > 2);
   RollingNavBar.iconData({
     @required this.iconData,
+    this.activeBadgeColors,
     this.activeIconColors,
     this.activeIndex = 0,
     this.animationCurve = Curves.linear,
@@ -220,6 +228,9 @@ class RollingNavBar extends StatelessWidget {
   })  : children = null,
         assert(iconText == null || iconText.length == iconData.length),
         assert(indicatorSides > 2),
+        assert(activeBadgeColors == null ||
+            activeBadgeColors.length == 1 ||
+            activeBadgeColors.length == iconData.length),
         assert(activeIconColors == null ||
             activeIconColors.length == 1 ||
             activeIconColors.length == iconData.length),
@@ -232,10 +243,11 @@ class RollingNavBar extends StatelessWidget {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         return _RollingNavBarInner(
-          animationType: animationType,
+          activeBadgeColors: activeBadgeColors,
           activeIconColors: activeIconColors,
           activeIndex: activeIndex,
           animationCurve: animationCurve,
+          animationType: animationType,
           badges: badges,
           baseAnimationSpeed: baseAnimationSpeed,
           height: constraints.maxHeight,
@@ -260,6 +272,7 @@ class RollingNavBar extends StatelessWidget {
 }
 
 class _RollingNavBarInner extends StatefulWidget {
+  final List<Color> activeBadgeColors;
   final List<Color> activeIconColors;
   final int activeIndex;
   final Curve animationCurve;
@@ -282,6 +295,7 @@ class _RollingNavBarInner extends StatefulWidget {
   final BoxDecoration navBarDecoration;
   final double width;
   _RollingNavBarInner({
+    @required this.activeBadgeColors,
     @required this.activeIconColors,
     @required this.activeIndex,
     @required this.animationCurve,
@@ -588,6 +602,12 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
   }
 
   Color _getBadgeColor(int index) {
+    if (index == activeIndex && widget.activeBadgeColors != null) {
+      return widget.activeBadgeColors.length == 1
+          ? widget.activeBadgeColors[0]
+          : widget.activeBadgeColors[index];
+    }
+
     int inactiveIndex =
         widget.indicatorColors.length >= (index + 1) ? index : 0;
     return activeIndex == index
