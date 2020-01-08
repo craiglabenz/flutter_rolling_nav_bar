@@ -6,8 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:polygon_clipper/polygon_clipper.dart';
 import 'package:tinycolor/tinycolor.dart';
 
-enum Direction { forward, backward }
+enum Direction { forward, backward, stationary }
 enum AnimationType { roll, shrinkOutIn, snap, spinOutIn }
+typedef Widget RollingNavBarChildBuilder(
+  BuildContext context,
+  int index,
+  AnimationInfo animationInfo,
+  AnimationUpdate animationUpdate,
+);
 
 /// Container for the most primitive data necessary to drive our animation with
 /// functions to yield the next tier of calculated data for the animation.
@@ -133,8 +139,8 @@ class RollingNavBar extends StatelessWidget {
   /// Milliseconds for the background indicator to move one tab.
   final int baseAnimationSpeed;
 
-  /// Fully-formed widgets to render in the tab bar. Pass this or [iconData].
-  final List<Widget> children;
+  /// Optional builder function for the individual navigation icons.
+  final RollingNavBarChildBuilder builder;
 
   /// Optional override for icon colors. If supplied, must have a length of one
   /// or the same length as [iconData]. A length of 1 indicates a single color
@@ -169,6 +175,10 @@ class RollingNavBar extends StatelessWidget {
   /// Optional display override for the nav bar's background.
   final BoxDecoration navBarDecoration;
 
+  /// Used by the `builder()` constructor to know how many icons the tab bar
+  /// should contain.
+  final int numChildren;
+
   /// Optional handler which will be called on every tick of the animation.
   final Function(AnimationUpdate) onAnimate;
 
@@ -179,8 +189,9 @@ class RollingNavBar extends StatelessWidget {
   /// realistic rolling illusion.
   final double sidesPerListItem;
 
-  RollingNavBar.children({
-    @required this.children,
+  RollingNavBar.builder({
+    @required this.builder,
+    @required this.numChildren,
     this.activeBadgeColors,
     this.activeIndex = 0,
     this.animationCurve = Curves.linear,
@@ -202,9 +213,10 @@ class RollingNavBar extends StatelessWidget {
         iconText = null,
         assert(activeBadgeColors == null ||
             activeBadgeColors.length == 1 ||
-            activeBadgeColors.length == children.length),
-        assert(badges == null || badges.length == children.length),
-        assert(indicatorSides > 2);
+            activeBadgeColors.length == numChildren),
+        assert(badges == null || badges.length == numChildren),
+        assert(indicatorSides > 2),
+        assert(numChildren != null);
   RollingNavBar.iconData({
     @required this.iconData,
     this.activeBadgeColors,
@@ -225,7 +237,8 @@ class RollingNavBar extends StatelessWidget {
     this.onAnimate,
     this.onTap,
     this.sidesPerListItem,
-  })  : children = null,
+  })  : numChildren = iconData.length,
+        builder = null,
         assert(iconText == null || iconText.length == iconData.length),
         assert(indicatorSides > 2),
         assert(activeBadgeColors == null ||
@@ -250,9 +263,8 @@ class RollingNavBar extends StatelessWidget {
           animationType: animationType,
           badges: badges,
           baseAnimationSpeed: baseAnimationSpeed,
+          builder: builder,
           height: constraints.maxHeight,
-          width: constraints.maxWidth,
-          children: children,
           iconColors: iconColors,
           iconData: iconData,
           iconSize: iconSize,
@@ -261,10 +273,12 @@ class RollingNavBar extends StatelessWidget {
           indicatorCornerRadius: indicatorCornerRadius,
           indicatorRadius: indicatorRadius,
           indicatorSides: indicatorSides,
+          navBarDecoration: navBarDecoration,
+          numChildren: numChildren,
           onAnimate: onAnimate,
           onTap: onTap,
-          navBarDecoration: navBarDecoration,
           sidesPerListItem: sidesPerListItem,
+          width: constraints.maxWidth,
         );
       },
     );
@@ -279,8 +293,8 @@ class _RollingNavBarInner extends StatefulWidget {
   final AnimationType animationType;
   final List<Widget> badges;
   final int baseAnimationSpeed;
+  final RollingNavBarChildBuilder builder;
   final double height;
-  final List<Widget> children;
   final List<Color> iconColors;
   final List<IconData> iconData;
   final List<Widget> iconText;
@@ -289,6 +303,7 @@ class _RollingNavBarInner extends StatefulWidget {
   final double indicatorRadius;
   final int indicatorSides;
   final double iconSize;
+  final int numChildren;
   final Function(AnimationUpdate) onAnimate;
   final Function(int) onTap;
   final double sidesPerListItem;
@@ -302,7 +317,7 @@ class _RollingNavBarInner extends StatefulWidget {
     @required this.animationType,
     @required this.badges,
     @required this.baseAnimationSpeed,
-    @required this.children,
+    @required this.builder,
     @required this.height,
     @required this.iconColors,
     @required this.iconData,
@@ -312,6 +327,7 @@ class _RollingNavBarInner extends StatefulWidget {
     @required this.indicatorCornerRadius,
     @required this.indicatorRadius,
     @required this.indicatorSides,
+    @required this.numChildren,
     @required this.onAnimate,
     @required this.onTap,
     @required this.sidesPerListItem,
@@ -320,8 +336,6 @@ class _RollingNavBarInner extends StatefulWidget {
   });
   @override
   _RollingNavBarInnerState createState() => _RollingNavBarInnerState();
-
-  int get numChildren => children != null ? children.length : iconData.length;
 }
 
 class _RollingNavBarInnerState extends State<_RollingNavBarInner>
@@ -330,6 +344,9 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
   int activeIndex;
   int widgetActiveIndex;
   Color indicatorColor;
+
+  AnimationInfo animationInfo;
+  AnimationUpdate animationUpdate;
 
   // Size-based parameters
   double maxIndicatorRadius;
@@ -357,6 +374,38 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
     indicatorRadius = widget.indicatorRadius;
     indicatorRotation = 0;
     indicatorX = (tabChunkWidth / 2) + (activeIndex * tabChunkWidth);
+    animationUpdate = initializeAnimationUpdate();
+    animationInfo = initializeAnimationInfo();
+  }
+
+  AnimationUpdate initializeAnimationUpdate() {
+    return AnimationUpdate(
+      animationValue: 0,
+      rotation: 0,
+      percentAnimated: 0,
+      direction: Direction.stationary,
+      color: _getActiveIconColor(),
+    );
+  }
+
+  AnimationInfo initializeAnimationInfo() {
+    return AnimationInfo(
+      startingRotation: 0,
+      newIndex: 0,
+      oldIndex: 0,
+      numSides: widget.indicatorSides,
+      sidesPerListItem: sidesPerListItem,
+    );
+  }
+
+  AnimationUpdate getAnimationCompletedUpdate() {
+    return AnimationUpdate(
+      animationValue: 1,
+      rotation: animationUpdate.rotation,
+      percentAnimated: 1,
+      direction: Direction.stationary,
+      color: _getActiveIconColor(),
+    );
   }
 
   /// Measure of the available space for each nav item.
@@ -394,7 +443,7 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
       activeIndex = newIndex;
     });
 
-    var animationInfo = AnimationInfo(
+    animationInfo = AnimationInfo(
       newIndex: newIndex,
       numSides: widget.indicatorSides,
       oldIndex: _originalIndex,
@@ -441,14 +490,19 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
         );
         setState(() {});
         if (widget.onAnimate != null) {
-          var update = AnimationUpdate(
+          animationUpdate = AnimationUpdate(
             animationValue: curve.value,
             color: indicatorColor,
             direction: info.direction,
             percentAnimated: indicatorAnimationController.value,
             rotation: indicatorRotation,
           );
-          widget.onAnimate(update);
+          widget.onAnimate(animationUpdate);
+        }
+      })
+      ..addStatusListener((AnimationStatus status) {
+        if (status == AnimationStatus.completed) {
+          animationUpdate = getAnimationCompletedUpdate();
         }
       });
 
@@ -461,14 +515,14 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
       indicatorColor = _getRollerColor(activeIndex, activeIndex, 1.0);
     });
     if (widget.onAnimate != null) {
-      var update = AnimationUpdate(
+      animationUpdate = AnimationUpdate(
         animationValue: 1,
         color: indicatorColor,
         direction: info.direction,
         percentAnimated: 1,
         rotation: indicatorRotation,
       );
-      widget.onAnimate(update);
+      widget.onAnimate(animationUpdate);
     }
   }
 
@@ -504,14 +558,14 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
         setState(() {});
 
         if (widget.onAnimate != null) {
-          var update = AnimationUpdate(
+          animationUpdate = AnimationUpdate(
             animationValue: 1,
             color: indicatorColor,
             direction: info.direction,
             percentAnimated: indicatorAnimationController.value,
             rotation: indicatorRotation,
           );
-          widget.onAnimate(update);
+          widget.onAnimate(animationUpdate);
         }
       });
     indicatorAnimationController.forward();
@@ -551,28 +605,13 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
             width: widget.width,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: widget.children != null
-                  ? indexed(widget.children).map(_buildNavBarItem).toList()
+              children: widget.builder != null
+                  ? buildChildren()
                   : indexed(widget.iconData).map(_buildNavBarIcon).toList(),
             ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildNavBarItem(Indexed indexed) {
-    return _NavBarItem(
-      indexed.value,
-      badge: widget.badges != null && widget.badges.length >= indexed.index + 1
-          ? widget.badges[indexed.index]
-          : null,
-      badgeColor: _getBadgeColor(indexed.index),
-      isActive: activeIndex == indexed.index,
-      maxWidth: tabChunkWidth,
-      onPressed: () {
-        _setActive(indexed.index);
-      },
     );
   }
 
@@ -615,9 +654,25 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
         : widget.indicatorColors[inactiveIndex];
   }
 
+  List<Widget> buildChildren() {
+    return List<int>.generate(widget.numChildren, (i) => i)
+        .map<Widget>(
+          (int index) => _buildNavBarItem(
+            widget.builder(
+              context,
+              index,
+              animationInfo,
+              animationUpdate,
+            ),
+            Indexed(index, index),
+          ),
+        )
+        .toList();
+  }
+
   Widget _buildNavBarIcon(Indexed indexed) {
     final bool isActive = activeIndex == indexed.index;
-    return _NavBarItem(
+    return _buildNavBarItem(
       Icon(
         indexed.value,
         color: isActive
@@ -625,11 +680,21 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
             : _getInactiveIconColor(indexed.index),
         size: widget.iconSize,
       ),
+      indexed,
+    );
+  }
+
+  Widget _buildNavBarItem(Widget child, Indexed indexed) {
+    final bool isActive = activeIndex == indexed.index;
+    return _NavBarItem(
+      child,
       badge: widget.badges != null && widget.badges.length >= indexed.index + 1
           ? widget.badges[indexed.index]
           : null,
       badgeColor: _getBadgeColor(indexed.index),
       isActive: isActive,
+      height: widget.height,
+      key: Key('nav-bar-child-${indexed.index}'),
       maxWidth: tabChunkWidth,
       onPressed: () {
         _setActive(indexed.index);
@@ -660,6 +725,7 @@ class _NavBarItem extends StatelessWidget {
   final Color badgeColor;
   final Widget child;
   final bool isActive;
+  final double height;
   final Function onPressed;
   final double maxWidth;
   final Widget textWidget;
@@ -669,6 +735,7 @@ class _NavBarItem extends StatelessWidget {
     this.badge,
     this.badgeColor,
     this.isActive = false,
+    this.height,
     this.maxWidth,
     this.textWidget,
     Key key,
@@ -677,8 +744,10 @@ class _NavBarItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      behavior: HitTestBehavior.opaque, // Reduces rate of missed taps
       onTap: onPressed,
       child: Container(
+        height: height,
         width: maxWidth,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

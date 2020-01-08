@@ -61,21 +61,26 @@ RollingNavBar.iconData(
 )
 ```
 
-The second option is to pass a list of widgets, though less automatic active-state handling
-is available in this method.
+The second option is to provide a widget builder, though this comes with some loss of
+helpful active state management.
 
 ```dart
-RollingNavBar.children(
-  children: <Widget>[
-    Text('1', style: TextStyle(color: Colors.grey)),
-    Text('2', style: TextStyle(color: Colors.grey)),
-    Text('3', style: TextStyle(color: Colors.grey)),
-  ],
+RollingNavBar.builder(
+  builder: (context, index, info, update) {
+    // The `iconData` constructor handles all active state management,
+    // but this constructor, as it deals with completed widgets, must
+    // assume that you have already made all relevant considerations.
+    var textStyle = index == info.nextIndex
+      ? TextStyle(color: Colors.white)
+      : TextStyle(color: Colors.grey);
+    return Text('${index + 1}', style: style);
+  },
   indicatorColors: <Color>[
     Colors.red,
     Colors.yellow,
     Colors.blue,
   ],
+  numChildren: 3,
 )
 ```
 

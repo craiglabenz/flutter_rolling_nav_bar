@@ -36,18 +36,68 @@ void main() {
       expect(find.byIcon(Icons.person), findsOneWidget);
       expect(find.byIcon(Icons.settings), findsOneWidget);
     });
-    testWidgets('with simplest children parameters',
+
+    testWidgets('with simplest builder parameters',
         (WidgetTester tester) async {
+      final textWidgets = <Widget>[
+        Text('Home'),
+        Text('Friends'),
+        Text('Settings')
+      ];
       await tester.pumpWidget(
         _materialApp(
-          RollingNavBar.children(
-            children: <Widget>[Text('Home'), Text('Friends'), Text('Settings')],
+          RollingNavBar.builder(
+            builder: (BuildContext context, int index, AnimationInfo info,
+                AnimationUpdate update) {
+              return textWidgets[index];
+            },
+            numChildren: 3,
           ),
         ),
       );
       expect(find.text('Home'), findsOneWidget);
       expect(find.text('Friends'), findsOneWidget);
       expect(find.text('Settings'), findsOneWidget);
+    });
+
+    testWidgets('with builder onTap', (WidgetTester tester) async {
+      int tapped;
+      await tester.pumpWidget(
+        _materialApp(
+          RollingNavBar.builder(
+            builder: (BuildContext context, int index, AnimationInfo info,
+                AnimationUpdate update) {
+              return Text(index.toString(), key: Key('key-$index'));
+            },
+            numChildren: 3,
+            onTap: (int index) {
+              tapped = index;
+            },
+          ),
+        ),
+      );
+      await tester.tap(find.byKey(Key('key-1')));
+      expect(tapped, 1);
+    });
+
+    testWidgets('with iconData onTap', (WidgetTester tester) async {
+      int tapped;
+      await tester.pumpWidget(
+        _materialApp(
+          RollingNavBar.iconData(
+            iconData: <IconData>[
+              Icons.home,
+              Icons.person,
+              Icons.settings,
+            ],
+            onTap: (int index) {
+              tapped = index;
+            },
+          ),
+        ),
+      );
+      await tester.tap(find.byKey(Key('nav-bar-child-2')));
+      expect(tapped, 2);
     });
 
     testWidgets('with iconData and text', (WidgetTester tester) async {

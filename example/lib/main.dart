@@ -92,6 +92,12 @@ class _MyAppState extends State<MyApp> {
     setState(() {});
   }
 
+  List<Widget> get builderChildren => const <Widget>[
+        Text('1', style: TextStyle(color: Colors.grey)),
+        Text('2', style: TextStyle(color: Colors.grey)),
+        Text('3', style: TextStyle(color: Colors.grey)),
+      ];
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -101,7 +107,7 @@ class _MyAppState extends State<MyApp> {
       home: Builder(
         builder: (BuildContext context) {
           double largeIconHeight = MediaQuery.of(context).size.width;
-          double navBarHeight = scaledHeight(context, 95);
+          double navBarHeight = scaledHeight(context, 85);
           double topOffset = (MediaQuery.of(context).size.height -
                   largeIconHeight -
                   MediaQuery.of(context).viewInsets.top -
@@ -135,7 +141,7 @@ class _MyAppState extends State<MyApp> {
                           child: Padding(
                             padding: EdgeInsets.fromLTRB(0, 100, 30, 0),
                             child: Transform(
-                              transform: Matrix4.skew(0.1, -0.55),
+                              transform: Matrix4.skew(0.1, -0.50),
                               child: Text(
                                 'Rolling\nNav Bar',
                                 textAlign: TextAlign.center,
@@ -192,18 +198,21 @@ class _MyAppState extends State<MyApp> {
                 onTap: _onTap,
               ),
 
-              // Option 2: More work, but there if you need it
-              // child: RollingNavBar.children(
-              //   badges: <Widget>[
-              //     null,
-              //     Text('1', style: TextStyle(color: Colors.white)),
-              //     null,
-              //   ],
-              //   children: <Widget>[
-              //     Text('1', style: TextStyle(color: Colors.grey)),
-              //     Text('2', style: TextStyle(color: Colors.grey)),
-              //     Text('3', style: TextStyle(color: Colors.grey)),
-              //   ],
+              // Option 2: Possibly more complicated, but there if you need it
+              // child: RollingNavBar.builder(
+              //   builder: (
+              //     BuildContext context,
+              //     int index,
+              //     AnimationInfo info,
+              //     AnimationUpdate update,
+              //   ) {
+              //     return builderChildren[index];
+              //   },
+              //   badges: badgeWidgets.sublist(0, builderChildren.length),
+              //   indicatorColors:
+              //       indicatorColors.sublist(0, builderChildren.length),
+              //   numChildren: builderChildren.length,
+              //   onTap: _onTap,
               // ),
             ),
           );
