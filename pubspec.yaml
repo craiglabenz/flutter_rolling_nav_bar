@@ -1,6 +1,6 @@
 name: rolling_nav_bar
 description: A Flutter nav bar with a rolling active indicator behind each icon
-version: 0.0.1-alpha+8
+version: 0.0.1
 homepage: https://github.com/craiglabenz/flutter_rolling_nav_bar
 
 environment:

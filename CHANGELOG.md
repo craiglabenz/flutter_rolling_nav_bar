@@ -1,3 +1,7 @@
+## [0.0.1] - 2019-01-07
+
+* Removed `children` constructor in favor of `builder` pattern
+
 ## [0.0.1-alpha+8] - 2019-12-28
 
 * Added customization for badge colors
