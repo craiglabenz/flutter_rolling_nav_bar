@@ -273,6 +273,7 @@ class RollingNavBar extends StatelessWidget {
           indicatorCornerRadius: indicatorCornerRadius,
           indicatorRadius: indicatorRadius,
           indicatorSides: indicatorSides,
+          isLtr: Directionality.of(context).index == 1,
           navBarDecoration: navBarDecoration,
           numChildren: numChildren,
           onAnimate: onAnimate,
@@ -303,6 +304,7 @@ class _RollingNavBarInner extends StatefulWidget {
   final double indicatorRadius;
   final int indicatorSides;
   final double iconSize;
+  final bool isLtr;
   final int numChildren;
   final Function(AnimationUpdate) onAnimate;
   final Function(int) onTap;
@@ -327,6 +329,7 @@ class _RollingNavBarInner extends StatefulWidget {
     @required this.indicatorCornerRadius,
     @required this.indicatorRadius,
     @required this.indicatorSides,
+    @required this.isLtr,
     @required this.numChildren,
     @required this.onAnimate,
     @required this.onTap,
@@ -373,7 +376,7 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
         : widget.indicatorColors.first;
     indicatorRadius = widget.indicatorRadius;
     indicatorRotation = 0;
-    indicatorX = (tabChunkWidth / 2) + (activeIndex * tabChunkWidth);
+    indicatorX = activeIndex * tabChunkWidth;
     animationUpdate = initializeAnimationUpdate();
     animationInfo = initializeAnimationInfo();
   }
@@ -413,7 +416,7 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
 
   /// The X coordinate our active indicator needs to reach after each click.
   /// This is only valid *after* updating `activeIndex`.
-  double get targetX => (tabChunkWidth / 2) + (activeIndex * tabChunkWidth);
+  double get targetX => activeIndex * tabChunkWidth;
 
   double _calculateSidesPerListItem() {
     int numChildren = widget.numChildren.clamp(3, 5);
@@ -580,8 +583,14 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
     );
   }
 
+  double get maxWidth =>
+      (widget.numChildren - 1) * tabChunkWidth + (tabChunkWidth / 2);
+
   @override
   Widget build(BuildContext context) {
+    double Function(double) directionalityCenterXTransform = widget.isLtr
+        ? (x) => x + (tabChunkWidth / 2) - indicatorRadius
+        : (x) => maxWidth - x - indicatorRadius;
     return Container(
       height: widget.height,
       decoration: widget.navBarDecoration ??
@@ -591,13 +600,13 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
       child: Stack(
         children: <Widget>[
           ActiveIndicator(
-            centerX: indicatorX - indicatorRadius,
+            centerX: directionalityCenterXTransform(indicatorX),
             centerY: (widget.height / 2) - indicatorRadius,
             color: indicatorColor,
             cornerRadius: widget.indicatorCornerRadius,
             height: indicatorRadius * 2,
             numSides: widget.indicatorSides,
-            rotation: indicatorRotation,
+            rotation: widget.isLtr ? indicatorRotation : indicatorRotation * -1,
             width: indicatorRadius * 2,
           ),
           Positioned(

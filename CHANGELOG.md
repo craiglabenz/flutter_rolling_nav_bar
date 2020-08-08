@@ -1,3 +1,8 @@
+## [0.0.2] - 2020-08-08
+
+* Added RTL support
+* Verified functionality with Flutter 1.20
+
 ## [0.0.1] - 2020-01-07
 
 * Removed `children` constructor in favor of `builder` pattern
