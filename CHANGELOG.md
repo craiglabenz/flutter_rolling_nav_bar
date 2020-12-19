@@ -1,3 +1,7 @@
+## [0.0.3] - 2020-12-19
+
+* Ensured onTap callback always fires, even if index is current
+
 ## [0.0.2] - 2020-08-08
 
 * Added RTL support

@@ -435,13 +435,15 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
   }
 
   void _setActive(int newIndex) {
-    if (newIndex == activeIndex) return;
-    var _originalIndex = activeIndex;
-
     // Invoke the optional handler for each tap event.
     if (widget.onTap != null) {
       widget.onTap(newIndex);
     }
+
+    if (newIndex == activeIndex) return;
+
+    var _originalIndex = activeIndex;
+
     setState(() {
       activeIndex = newIndex;
     });

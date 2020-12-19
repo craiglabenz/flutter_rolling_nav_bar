@@ -71,7 +71,6 @@ class _MyAppState extends State<MyApp> {
   void incrementIndex() {
     setState(() {
       activeIndex = activeIndex < (iconData.length - 1) ? activeIndex + 1 : 0;
-      print(activeIndex);
     });
   }
 
@@ -105,8 +104,9 @@ class _MyAppState extends State<MyApp> {
         scaffoldBackgroundColor: Colors.blue[100],
       ),
       home: Directionality(
-        textDirection: TextDirection.rtl,
+        // textDirection: TextDirection.rtl,
         // textDirection: TextDirection.ltr,
+        textDirection: Directionality.of(context) ?? TextDirection.ltr,
         child: Builder(
           builder: (BuildContext context) {
             double largeIconHeight = MediaQuery.of(context).size.width;
@@ -123,7 +123,7 @@ class _MyAppState extends State<MyApp> {
                 onPressed: _incrementBadge,
               ),
               appBar: AppBar(
-                title: Text('Rolling Nav Bar'),
+                title: Text('Rolling Nav Bar: Tab ${activeIndex + 1}'),
               ),
               body: Stack(
                 children: <Widget>[
