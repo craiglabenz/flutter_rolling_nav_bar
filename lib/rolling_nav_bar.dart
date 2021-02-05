@@ -435,11 +435,6 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
   }
 
   void _setActive(int newIndex) {
-    // Invoke the optional handler for each tap event.
-    if (widget.onTap != null) {
-      widget.onTap(newIndex);
-    }
-
     if (newIndex == activeIndex) return;
 
     var _originalIndex = activeIndex;
@@ -709,6 +704,10 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
       maxWidth: tabChunkWidth,
       onPressed: () {
         _setActive(indexed.index);
+        // Invoke the optional handler for each tap event.
+        if (widget.onTap != null) {
+          widget.onTap(newIndex);
+        }
       },
       textWidget: widget.iconText != null &&
               !isActive &&
