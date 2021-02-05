@@ -706,7 +706,7 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
         _setActive(indexed.index);
         // Invoke the optional handler for each tap event.
         if (widget.onTap != null) {
-          widget.onTap(newIndex);
+          widget.onTap(indexed.index);
         }
       },
       textWidget: widget.iconText != null &&
