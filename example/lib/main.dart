@@ -74,7 +74,6 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  // ignore: unused_element
   _onAnimate(AnimationUpdate update) {
     setState(() {
       logoColor = update.color;
@@ -82,7 +81,11 @@ class _MyAppState extends State<MyApp> {
   }
 
   _onTap(int index) {
+    if (activeIndex == index) {
+      _incrementBadge();
+    }
     activeIndex = index;
+    setState(() {});
   }
 
   void _incrementBadge() {
@@ -178,7 +181,6 @@ class _MyAppState extends State<MyApp> {
                 ],
               ),
               bottomNavigationBar: Container(
-                // bottom: 0,
                 height: navBarHeight,
                 width: MediaQuery.of(context).size.width,
                 // Option 1: Recommended
@@ -201,7 +203,7 @@ class _MyAppState extends State<MyApp> {
                   onTap: _onTap,
                 ),
 
-                // Option 2: Possibly more complicated, but there if you need it
+                // Option 2: More complicated, but there if you need it
                 // child: RollingNavBar.builder(
                 //   builder: (
                 //     BuildContext context,

@@ -168,14 +168,12 @@ RollingNavBar.iconData(
 
 <br>
 
-
 ## Hooking into the animation
 
 In the demo, the background of the larger hexagon matches the background of
 the nav bar hexagon. To achieve this and similar effects, two callbacks, `onTap` and
 `onAnimate`, are available. `onAnimate` can be particularly helpful for syncing
 visual effects elsewhere in your app with nav bar progress.
-
 
 ## Tab Item Text
 
@@ -227,7 +225,6 @@ RollingNavBar.iconData(
 
 <img src="https://raw.githubusercontent.com/craiglabenz/flutter_rolling_nav_bar/master/doc/assets/badges.png" alt="Badges Example" height="600" />
 
-
 ## Driving Navigation Bar Changes
 
 You can programmatically change the active navigation bar tab by passing a new `activeIndex` to the `RollingNavBar` widget. However, there are two steps to successfully keeping everything in sync.
@@ -239,14 +236,19 @@ class _MyAppState extends State<MyApp> {
   /// Handler that responds to navigation events (likely derived
   /// from user clicks) and keeps the parent in sync.
   void _onTap(int index) {
-    // Do not call `setState()`!
-    activeIndex = index;
+    setState(() {
+      activeIndex = index;
+    });
   }
 
   /// Handler for when you want to programmatically change
   /// the active index. Calling `setState()` here causes
   /// Flutter to re-render the tree, which `RollingNavBar`
   /// responds to by running its normal animation.
+  ///
+  /// Note: This is an example function that you can define
+  /// and call wherever you like. That is why it is not passed
+  /// to `RollingNavBar.iconData` in the `build` method.
   void changeActiveIndex(int index) {
     setState((){
       activeIndex = index;

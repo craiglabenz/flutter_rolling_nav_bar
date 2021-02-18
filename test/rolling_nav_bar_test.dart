@@ -13,7 +13,7 @@ void main() {
   }) {
     return MaterialApp(
       home: Scaffold(
-        body: Container(
+        bottomNavigationBar: Container(
           child: navBar,
           height: height,
           width: width,
