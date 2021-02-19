@@ -1,4 +1,4 @@
-## [0.0.4.null-safety] - 2021-02-18
+## [0.0.4.null-safety.1] - 2021-02-18
 
 - Added null-safety declarations
 
