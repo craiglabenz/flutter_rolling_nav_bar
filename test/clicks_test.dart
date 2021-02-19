@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import './stateful_test_widget.dart';
 
 void main() {
-  Widget _rollingNavBarApp([Function(int) onTap]) {
+  Widget _rollingNavBarApp([Function(int)? onTap]) {
     return MaterialApp(
       home: StatefulTestWidget(onTap),
     );

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:rolling_nav_bar/rolling_nav_bar.dart';
 
 class StatefulTestWidget extends StatefulWidget {
-  final Function(int) onTap;
+  final Function(int)? onTap;
   StatefulTestWidget([this.onTap]);
 
   @override
@@ -38,7 +38,7 @@ class _StatefulTestWidget extends State<StatefulTestWidget> {
           onTap: (int index) {
             _onTap(index);
             if (widget.onTap != null) {
-              widget.onTap(index);
+              widget.onTap!(index);
             }
           },
         ),
