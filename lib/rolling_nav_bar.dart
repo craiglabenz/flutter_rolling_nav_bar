@@ -128,7 +128,7 @@ class RollingNavBar extends StatelessWidget {
 
   /// Optional list of badges to apply to each nav item. [null] placeholders
   /// in the list are necessary for unbadged tab bar items.
-  final List<Widget>? badges;
+  final List<Widget?>? badges;
 
   /// Initial tab in the highlighted state.
   final int activeIndex;
@@ -259,7 +259,7 @@ class RollingNavBar extends StatelessWidget {
       builder: (BuildContext context, BoxConstraints constraints) {
         return _RollingNavBarInner(
           activeBadgeColors: activeBadgeColors,
-          activeIconColors: activeIconColors ?? iconColors,
+          activeIconColors: activeIconColors,
           activeIndex: activeIndex,
           animationCurve: animationCurve,
           animationType: animationType,
@@ -294,7 +294,7 @@ class _RollingNavBarInner extends StatefulWidget {
   final int activeIndex;
   final Curve animationCurve;
   final AnimationType animationType;
-  final List<Widget>? badges;
+  final List<Widget?>? badges;
   final int baseAnimationSpeed;
   final RollingNavBarChildBuilder? builder;
   final double height;
