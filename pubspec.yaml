@@ -1,15 +1,15 @@
 name: rolling_nav_bar
 description: A Flutter nav bar with a rolling active indicator behind each icon
-version: 0.0.5-nullsafety.1
+version: 0.0.5-nullsafety.3
 homepage: https://github.com/craiglabenz/flutter_rolling_nav_bar
 
 environment:
   sdk: ">=2.12.0-0 <3.0.0"
 
 dependencies:
-  badges: ^1.1.0
-  polygon_clipper: ^1.0.2
-  tinycolor: ^1.0.2
+  badges: ^2.0.0-nullsafety.1
+  flutter_polygon: ^0.2.0
+  tinycolor: ^1.0.3
   flutter:
     sdk: flutter
 

@@ -7,14 +7,14 @@ packages:
       name: async
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.5.0"
+    version: "2.6.0"
   badges:
     dependency: transitive
     description:
       name: badges
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.0"
+    version: "2.0.0-nullsafety.1"
   boolean_selector:
     dependency: transitive
     description:
@@ -69,6 +69,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_polygon:
+    dependency: "direct main"
+    description:
+      name: flutter_polygon
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -102,20 +109,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.3"
-  polygon_clipper:
-    dependency: "direct main"
-    description:
-      name: polygon_clipper
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.2"
   rolling_nav_bar:
     dependency: "direct main"
     description:
       path: ".."
       relative: true
     source: path
-    version: "0.0.4-nullsafety.1"
+    version: "0.0.5-nullsafety.3"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -127,7 +127,7 @@ packages:
       name: source_span
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.8.0"
+    version: "1.8.1"
   stack_trace:
     dependency: transitive
     description:
@@ -162,14 +162,14 @@ packages:
       name: test_api
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.2.19"
+    version: "0.3.0"
   tinycolor:
     dependency: transitive
     description:
       name: tinycolor
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.2"
+    version: "1.0.3"
   typed_data:
     dependency: transitive
     description:
@@ -185,5 +185,5 @@ packages:
     source: hosted
     version: "2.1.0"
 sdks:
-  dart: ">=2.12.0-0.0 <3.0.0"
-  flutter: ">=0.2.5"
+  dart: ">=2.12.0 <3.0.0"
+  flutter: ">=1.12.0"
