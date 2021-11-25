@@ -9,7 +9,7 @@ environment:
 dependencies:
   badges: ^2.0.0-nullsafety.1
   flutter_polygon: ^0.2.0
-  tinycolor: ^1.0.3
+  tinycolor2: ^2.0.0
   flutter:
     sdk: flutter
 

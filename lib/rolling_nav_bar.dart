@@ -5,7 +5,7 @@ import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polygon/flutter_polygon.dart';
 // ignore: import_of_legacy_library_into_null_safe
-import 'package:tinycolor/tinycolor.dart';
+import 'package:tinycolor2/tinycolor2.dart';
 
 enum Direction { forward, backward, stationary }
 enum AnimationType { roll, shrinkOutIn, snap, spinOutIn }
@@ -357,7 +357,7 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
 
   // Rotation-based parameters
   double? indicatorRotation; // in radians
-  double? indicatorX;
+  late double indicatorX;
   double? sidesPerListItem;
 
   // Controllers for any `AnimationType`
@@ -482,7 +482,7 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
               indicatorRotation = info.startingRotation! -
                   (info.radiansToRotateDelta * curve.value);
             }
-            indicatorX = _indicatorXAnimationStart! +
+            indicatorX = _indicatorXAnimationStart +
                 (targetX - _indicatorXAnimationStart) * curve.value;
             indicatorColor = _getRollerColor(
               info.oldIndex,
@@ -587,11 +587,9 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
 
   @override
   Widget build(BuildContext context) {
-    double Function(double?) directionalityCenterXTransform = widget.isLtr
-        ? ((double x) => x + (tabChunkWidth / 2) - indicatorRadius) as double
-            Function(double?)
-        : ((double x) => maxWidth - x - indicatorRadius) as double Function(
-            double?);
+    double Function(double) directionalityCenterXTransform = widget.isLtr
+        ? ((double x) => x + (tabChunkWidth / 2) - indicatorRadius)
+        : ((double x) => maxWidth - x - indicatorRadius);
     return Container(
       height: widget.height,
       decoration: widget.navBarDecoration ??
