@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:polygon_clipper/polygon_clipper.dart';
+import 'package:flutter_polygon/flutter_polygon.dart';
 import 'package:rolling_nav_bar/indexed.dart';
 import 'package:rolling_nav_bar/rolling_nav_bar.dart';
 
@@ -21,8 +21,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  Color logoColor;
-  int activeIndex;
+  Color logoColor = Colors.red[600]!;
+  int activeIndex = 0;
 
   var iconData = <IconData>[
     Icons.home,
@@ -32,7 +32,7 @@ class _MyAppState extends State<MyApp> {
     Icons.settings,
   ];
 
-  var badges = <int>[null, null, null, null, null];
+  var badges = <int>[0, 0, 0, 0, 0];
 
   var iconText = <Widget>[
     Text('Home', style: TextStyle(color: Colors.grey, fontSize: 12)),
@@ -50,8 +50,8 @@ class _MyAppState extends State<MyApp> {
     Colors.purple,
   ];
 
-  List<Widget> get badgeWidgets => indexed(badges)
-      .map((Indexed indexed) => indexed.value != null
+  List<Widget?> get badgeWidgets => indexed(badges)
+      .map((Indexed indexed) => indexed.value > 0
           ? Text(indexed.value.toString(),
               style: TextStyle(
                 color: indexed.index == activeIndex
@@ -60,13 +60,6 @@ class _MyAppState extends State<MyApp> {
               ))
           : null)
       .toList();
-
-  @override
-  void initState() {
-    logoColor = Colors.red[600];
-    activeIndex = 0;
-    super.initState();
-  }
 
   void incrementIndex() {
     setState(() {
@@ -89,9 +82,9 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _incrementBadge() {
-    badges[activeIndex] =
-        badges[activeIndex] == null ? 1 : badges[activeIndex] + 1;
-    setState(() {});
+    setState(() {
+      badges[activeIndex] += 1;
+    });
   }
 
   List<Widget> get builderChildren => const <Widget>[
@@ -106,70 +99,65 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.blue[100],
       ),
-      home: Directionality(
-        // textDirection: TextDirection.rtl,
-        // textDirection: TextDirection.ltr,
-        textDirection: Directionality.of(context) ?? TextDirection.ltr,
-        child: Builder(
-          builder: (BuildContext context) {
-            double largeIconHeight = MediaQuery.of(context).size.width;
-            double navBarHeight = scaledHeight(context, 85);
-            double topOffset = (MediaQuery.of(context).size.height -
-                    largeIconHeight -
-                    MediaQuery.of(context).viewInsets.top -
-                    (navBarHeight * 2)) /
-                2;
-            return Scaffold(
-              floatingActionButton: FloatingActionButton(
-                backgroundColor: logoColor,
-                child: Icon(Icons.add),
-                onPressed: _incrementBadge,
-              ),
-              appBar: AppBar(
-                title: Text('Rolling Nav Bar: Tab ${activeIndex + 1}'),
-              ),
-              body: Stack(
-                children: <Widget>[
-                  Positioned(
-                    top: topOffset,
-                    height: largeIconHeight,
-                    width: largeIconHeight,
-                    child: GestureDetector(
-                      onTap: incrementIndex,
-                      child: ClipPolygon(
-                        sides: 6,
-                        borderRadius: 15,
-                        child: Container(
-                          height: largeIconHeight,
-                          width: largeIconHeight,
-                          color: logoColor,
-                          child: Center(
-                            child: Padding(
-                              padding: EdgeInsets.fromLTRB(0, 100, 30, 0),
-                              child: Transform(
-                                transform: Matrix4.skew(0.1, -0.50),
-                                child: Text(
-                                  'Rolling\nNav Bar',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: scaledWidth(context, 63),
-                                    fontFeatures: <FontFeature>[
-                                      FontFeature.enable('smcp')
-                                    ],
-                                    shadows: <Shadow>[
-                                      Shadow(
-                                        offset: Offset(5, 5),
-                                        blurRadius: 3.0,
-                                        color: Color.fromARGB(255, 0, 0, 0),
-                                      ),
-                                      Shadow(
-                                        offset: Offset(5, 5),
-                                        blurRadius: 8.0,
-                                        color: Color.fromARGB(125, 0, 0, 255),
-                                      ),
-                                    ],
-                                  ),
+      home: Builder(
+        builder: (BuildContext context) {
+          double largeIconHeight = MediaQuery.of(context).size.width;
+          double navBarHeight = scaledHeight(context, 85);
+          double topOffset = (MediaQuery.of(context).size.height -
+                  largeIconHeight -
+                  MediaQuery.of(context).viewInsets.top -
+                  (navBarHeight * 2)) /
+              2;
+          return Scaffold(
+            floatingActionButton: FloatingActionButton(
+              backgroundColor: logoColor,
+              child: Icon(Icons.add),
+              onPressed: _incrementBadge,
+            ),
+            appBar: AppBar(
+              title: Text('Rolling Nav Bar: Tab ${activeIndex + 1}'),
+            ),
+            body: Stack(
+              children: <Widget>[
+                Positioned(
+                  top: topOffset,
+                  height: largeIconHeight,
+                  width: largeIconHeight,
+                  child: GestureDetector(
+                    onTap: incrementIndex,
+                    child: ClipPolygon(
+                      sides: 6,
+                      borderRadius: 15,
+                      child: Container(
+                        height: largeIconHeight,
+                        width: largeIconHeight,
+                        color: logoColor,
+                        child: Center(
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(0, 100, 30, 0),
+                            child: Transform(
+                              transform: Matrix4.skew(0.1, -0.50),
+                              child: Text(
+                                'Rolling\nNav Bar',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: scaledWidth(context, 63),
+                                  fontFeatures: <FontFeature>[
+                                    FontFeature.enable('smcp')
+                                  ],
+                                  shadows: <Shadow>[
+                                    Shadow(
+                                      offset: Offset(5, 5),
+                                      blurRadius: 3.0,
+                                      color: Color.fromARGB(255, 0, 0, 0),
+                                    ),
+                                    Shadow(
+                                      offset: Offset(5, 5),
+                                      blurRadius: 8.0,
+                                      color: Color.fromARGB(125, 0, 0, 255),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -178,51 +166,51 @@ class _MyAppState extends State<MyApp> {
                       ),
                     ),
                   ),
-                ],
-              ),
-              bottomNavigationBar: Container(
-                height: navBarHeight,
-                width: MediaQuery.of(context).size.width,
-                // Option 1: Recommended
-                child: RollingNavBar.iconData(
-                  activeBadgeColors: <Color>[
-                    Colors.white,
-                  ],
-                  activeIndex: activeIndex,
-                  animationCurve: Curves.linear,
-                  animationType: AnimationType.roll,
-                  baseAnimationSpeed: 200,
-                  badges: badgeWidgets,
-                  iconData: iconData,
-                  iconColors: <Color>[Colors.grey[800]],
-                  iconText: iconText,
-                  indicatorColors: indicatorColors,
-                  iconSize: 25,
-                  indicatorRadius: scaledHeight(context, 30),
-                  onAnimate: _onAnimate,
-                  onTap: _onTap,
                 ),
-
-                // Option 2: More complicated, but there if you need it
-                // child: RollingNavBar.builder(
-                //   builder: (
-                //     BuildContext context,
-                //     int index,
-                //     AnimationInfo info,
-                //     AnimationUpdate update,
-                //   ) {
-                //     return builderChildren[index];
-                //   },
-                //   badges: badgeWidgets.sublist(0, builderChildren.length),
-                //   indicatorColors:
-                //       indicatorColors.sublist(0, builderChildren.length),
-                //   numChildren: builderChildren.length,
-                //   onTap: _onTap,
-                // ),
+              ],
+            ),
+            bottomNavigationBar: Container(
+              height: navBarHeight,
+              width: MediaQuery.of(context).size.width,
+              // Option 1: Recommended
+              child: RollingNavBar.iconData(
+                activeBadgeColors: <Color>[
+                  Colors.white,
+                ],
+                activeIndex: activeIndex,
+                animationCurve: Curves.linear,
+                animationType: AnimationType.roll,
+                baseAnimationSpeed: 200,
+                badges: badgeWidgets,
+                iconData: iconData,
+                iconColors: <Color>[Colors.grey[800]!],
+                iconText: iconText,
+                indicatorColors: indicatorColors,
+                iconSize: 25,
+                indicatorRadius: scaledHeight(context, 30),
+                onAnimate: _onAnimate,
+                onTap: _onTap,
               ),
-            );
-          },
-        ),
+
+              // Option 2: More complicated, but there if you need it
+              // child: RollingNavBar.builder(
+              //   builder: (
+              //     BuildContext context,
+              //     int index,
+              //     AnimationInfo info,
+              //     AnimationUpdate update,
+              //   ) {
+              //     return builderChildren[index];
+              //   },
+              //   badges: badgeWidgets.sublist(0, builderChildren.length),
+              //   indicatorColors:
+              //       indicatorColors.sublist(0, builderChildren.length),
+              //   numChildren: builderChildren.length,
+              //   onTap: _onTap,
+              // ),
+            ),
+          );
+        },
       ),
     );
   }

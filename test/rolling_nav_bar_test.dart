@@ -47,10 +47,13 @@ void main() {
       await tester.pumpWidget(
         _materialApp(
           RollingNavBar.builder(
-            builder: (BuildContext context, int index, AnimationInfo info,
-                AnimationUpdate update) {
-              return textWidgets[index];
-            },
+            builder: (
+              BuildContext context,
+              int index,
+              AnimationInfo? info,
+              AnimationUpdate? update,
+            ) =>
+                textWidgets[index],
             numChildren: 3,
           ),
         ),
@@ -61,14 +64,17 @@ void main() {
     });
 
     testWidgets('with builder onTap', (WidgetTester tester) async {
-      int tapped;
+      int? tapped;
       await tester.pumpWidget(
         _materialApp(
           RollingNavBar.builder(
-            builder: (BuildContext context, int index, AnimationInfo info,
-                AnimationUpdate update) {
-              return Text(index.toString(), key: Key('key-$index'));
-            },
+            builder: (
+              BuildContext context,
+              int index,
+              AnimationInfo? info,
+              AnimationUpdate? update,
+            ) =>
+                Text(index.toString(), key: Key('key-$index')),
             numChildren: 3,
             onTap: (int index) {
               tapped = index;
@@ -81,7 +87,7 @@ void main() {
     });
 
     testWidgets('with iconData onTap', (WidgetTester tester) async {
-      int tapped;
+      int? tapped;
       await tester.pumpWidget(
         _materialApp(
           RollingNavBar.iconData(

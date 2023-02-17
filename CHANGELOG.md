@@ -1,3 +1,11 @@
+## [0.0.5-nullsafety.3] - 2021-05-10
+
+- Updated available dependencies to null-safe versions
+
+## [0.0.5-nullsafety.1] - 2021-02-18
+
+- Added null-safety declarations
+
 ## [0.0.4] - 2021-02-17
 
 - Fixed problem where a supplied `onTap()` callback could not call `setState()`
