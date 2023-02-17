@@ -1,11 +1,11 @@
 import 'dart:math';
 
 import 'indexed.dart';
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:flutter/material.dart';
 import 'package:flutter_polygon/flutter_polygon.dart';
 // ignore: import_of_legacy_library_into_null_safe
-import 'package:tinycolor/tinycolor.dart';
+import 'package:tinycolor2/tinycolor2.dart';
 
 enum Direction { forward, backward, stationary }
 enum AnimationType { roll, shrinkOutIn, snap, spinOutIn }
@@ -588,10 +588,8 @@ class _RollingNavBarInnerState extends State<_RollingNavBarInner>
   @override
   Widget build(BuildContext context) {
     double Function(double?) directionalityCenterXTransform = widget.isLtr
-        ? ((double x) => x + (tabChunkWidth / 2) - indicatorRadius) as double
-            Function(double?)
-        : ((double x) => maxWidth - x - indicatorRadius) as double Function(
-            double?);
+        ? ((double? x) => x! + (tabChunkWidth / 2) - indicatorRadius)
+        : ((double? x) => maxWidth - x! - indicatorRadius);
     return Container(
       height: widget.height,
       decoration: widget.navBarDecoration ??
@@ -790,8 +788,10 @@ class _OptionalBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return badge != null
-        ? Badge(
-            badgeColor: color!,
+        ? badges.Badge(
+            badgeStyle: badges.BadgeStyle(
+              badgeColor: color!,
+            ),
             badgeContent: badge!,
             child: child,
           )
